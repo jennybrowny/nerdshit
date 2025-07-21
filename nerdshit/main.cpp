@@ -11,8 +11,8 @@
 //    ./game (on Mac/Linux)
 //    game.exe (on Windows)
 //
-// NOTE: You'll also need a font file called "arial.ttf" in the same folder
-// Download any .ttf font file and rename it to arial.ttf
+//
+// NERDSHIT
 #include <iostream>
 #include "Game.h"
 
@@ -41,6 +41,6 @@ int main() {
         return -1;
     }
 
-    std::cout << "Thanks for playing nerdshit! Hope you survived engineering!" << std::endl;
+    std::cout << "Pau" << std::endl;
     return 0;
 }
