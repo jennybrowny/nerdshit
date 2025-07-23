@@ -1,43 +1,52 @@
 #include "button.hpp"
 
-// updated constructor with font and text
-Button::Button(sf::Vector2f size, sf::Vector2f position, sf::Color color, sf::Font& font, std::string text) 
-    : buttonColor(color), buttonText(nullptr) {
-    
-    // set up the rectangle
+Button::Button(sf::Vector2f size, sf::Vector2f position, sf::Color color,
+               sf::Font& font, const std::string& text, sf::SoundBuffer& buffer)
+    : normalColor(color),
+      hoverColor(color.r + 50, color.g + 50, color.b + 50),
+      pressedColor(color.r - 50, color.g - 50, color.b - 50),
+      clickSound(new sf::Sound(buffer)) 
+{
     buttonShape.setSize(size);
     buttonShape.setPosition(position);
-    buttonShape.setFillColor(color);
+    buttonShape.setFillColor(normalColor);
     
-    // create text object with font (sfml 3.0 way)
     buttonText = new sf::Text(font);
     buttonText->setString(text);
-    buttonText->setCharacterSize(24);           // nice readable size
-    buttonText->setFillColor(sf::Color::White); // white text on green button
+    buttonText->setCharacterSize(24);
+    buttonText->setFillColor(sf::Color::White);
     
-    // center the text on the button (fixed for sfml 3.0)
     sf::FloatRect textBounds = buttonText->getLocalBounds();
-    sf::Vector2f buttonCenter = position + size / 2.0f;
-    
-    sf::Vector2f textPos(
-        buttonCenter.x - textBounds.size.x / 2.0f,  // use .size.x instead of .width
-        buttonCenter.y - textBounds.size.y / 2.0f   // use .size.y instead of .height
-    );
-    
-    buttonText->setPosition(textPos);  // fixed: use Vector2f for sfml 3.0
+    buttonText->setOrigin({
+        textBounds.size.x/2.0f,
+        textBounds.size.y/2.0f
+    });
+    buttonText->setPosition({
+        position.x + size.x/2.0f,
+        position.y + size.y/2.0f
+    });
 }
 
 Button::~Button() {
-    delete buttonText;  // clean up text memory
+    delete buttonText;
+    delete clickSound;
 }
 
-void Button::draw(sf::RenderWindow& window) {
-    window.draw(buttonShape);  // draw button rectangle
-    if (buttonText) {
-        window.draw(*buttonText);   // draw text on top (dereference pointer)
-    }
+void Button::update(const sf::Vector2f& mousePos) {
+    isHovered = buttonShape.getGlobalBounds().contains(mousePos);
+    buttonShape.setFillColor(isHovered ? hoverColor : normalColor);
 }
 
 bool Button::isClicked(sf::Vector2f mousePos) {
-    return buttonShape.getGlobalBounds().contains(mousePos);
+    if (buttonShape.getGlobalBounds().contains(mousePos)) {
+        clickSound->play();
+        if (onClick) onClick();
+        return true;
+    }
+    return false;
+}
+
+void Button::draw(sf::RenderWindow& window) {
+    window.draw(buttonShape);
+    if (buttonText) window.draw(*buttonText);
 }

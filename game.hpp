@@ -1,7 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>  // Add this for music support
-#include <iostream>
+#include <SFML/Audio.hpp>
 
 enum GameState {
     START_SCREEN,
@@ -22,11 +21,16 @@ private:
     sf::Texture titleTexture;
     sf::Sprite* titleSprite;
     Button* startButton;
+    sf::SoundBuffer clickBuffer;
+    sf::Sound clickSound;  // Will be initialized with buffer
     sf::Color bgColor;
     sf::Font font;
     GameState currentScreen;
-    
-    // Music system (corrected syntax)
-    sf::Music introMusic;  // Fixed: sf::Music with ::
+    sf::Music introMusic;
     bool isMusicPlaying;
+ // Tutorial System
+    std::vector<sf::Texture> tutorialTextures;  // Stores ACT0 images
+    sf::Sprite currentTutorialSprite;           // Current fullscreen image
+    sf::Sound tutorialSound;                    // Single shared sound
+    int currentTutorialIndex = 0;               // Tracks image progress           // Which picture we're showing
 };

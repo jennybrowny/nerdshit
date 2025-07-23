@@ -1,0 +1,48 @@
+// Nerdshit log of edits cause I canʻt remember shit
+// used Replit, Deepseek
+
+// ----------------------------------------
+// 7/21: 7 PM - 10 PM 
+// Wins: 
+// Game fucking compiles HOLY LEE SHIT AFTER THREE FUCKING WEEKS
+// Window is created (thanks Herve)
+// Window can upload a background image of nerd central
+// Start button created to go to introduction 
+
+// [TO DO 7/22, 3-5 Hours]
+// - Introduction ACT 0?
+// - Background sprite of bedroom with storytime spirtes to introduce the player to the game
+// - Dr. Song Choi sprite with his dialouge sprite because textboxes look P.O.O.R!
+// - Transitions to ACT 1: Mangoman ECE160  [ideal]
+// realistic: base min is you get up to Dr. Choi 
+
+// note to self: focus on above ^^ --- everything else future me problem
+// use your resources, touch grass, balance but remember
+// youʻve wrote a grant in 4 days... and got funded (fuck you Dutra you almost fucked me over)... 
+// you AI your way through your x496 with min help from Dr. Paul Schmiit Ph.D and you know what he said?
+// "I believe in you" (just like Herve) but ngl he just didnʻt want to look at your code cause it was "spagghetti code" 
+// but you did it anyways and YOU CAN DO IT AGAIN! 
+// ----------------------------------------
+
+// ----------------------------------------
+// 7/22 2 PM - 4:52 PM
+// Wins: 
+// Refined used of classes: game, button (button looks great!)
+// Composition added: game contains button
+// Design patterns: use of statepatterns (start_screen, tutorial_Screen)
+// added sound onto start screen, buttons yay!
+//---
+// to do: the remaining issues are primarily API fixes and path validation. 
+// Gaps: still no inheritance (need screen class, ADD)
+// probably why tutorial is being whack
+// note to self: youʻre building a solid foundation of the core mechinanics now itʻs girlypoppifying it
+// you see the vision, you see the end goal, you see the light at the end of the tunnel. DO IT.
+// ----------------------------------------
+
+// ----------------------------------------
+// 7/22  FINISH ACT 1 | Gaps: still no inheritance (need screen class, ADD)
+// Wins: 
+
+//---
+
+// ----------------------------------------
