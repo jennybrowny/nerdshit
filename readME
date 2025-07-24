@@ -40,9 +40,21 @@
 // ----------------------------------------
 
 // ----------------------------------------
-// 7/22  FINISH ACT 1 | Gaps: still no inheritance (need screen class, ADD)
+// 7/22  7PM - 10:43 PM | Gaps: still no inheritance (need screen class, ADD)
 // Wins: 
-
+// - BROKE THE FUCKING GAME but then got it to work again but lesser... loaded it back up
+// - making progress on button inhertiance! Woot woot, like had to strip it but itʻs worth a decent chunk of points
 //---
-
+// GAPS OKAY SOME HOW I REMOVED THE FUCKING SOUND FROM BUTTONS 2 steps back one step forward
+// - Need to fix sound on button click but make it an good damn inhertiance class 
+// - start on report and ACT I NOW get those pages going! Throw that shit into GPT 
+//    - find out how to structure ACT 0 intsro rubric using design patterns 
+//    - Another button... 
+//    - put a pin on the button sound just get through Act 0 
+// NEXT STEPS: ACT 0 
+// go to game.cpp, your goal is to get one turtoial sprite on the screen (ACT1_01.PNG)
+// scaling must likely the issue, solve it and have it fit in termial
+// you tried manually saving it as a PNG to exact dimensions of the window but frankly looks like you auto scale it anyways
+// note to self: add sound to buttons but eh not as important as going to act 0 and having the player click through sprites
 // ----------------------------------------
+// 7/23 FINISH ACT 0
