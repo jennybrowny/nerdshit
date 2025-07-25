@@ -1,56 +1,71 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <iostream>
+#include <memory>
+#include <SFML/Window/Event.hpp>
 
-class BaseButton {
-protected:
-    static sf::SoundBuffer clickBuffer;
-    static bool soundLoaded;
-    sf::Sound clickSound;
-
-    // Private helper to initialize sound
-    void initSound() {
-        if (!soundLoaded) {
-            if (!clickBuffer.loadFromFile("assets/sounds/button_click.mp3")) {
-                std::cerr << "Failed to load button click sound!" << std::endl;
-            }
-            soundLoaded = true;
-        }
-        clickSound.setBuffer(clickBuffer);
-    }
-
+// Interface for button behaviors (Strategy Pattern)
+// This allows different button types to implement different behaviors
+class IButtonBehavior {
 public:
-    BaseButton() : clickSound(clickBuffer) {  // Initialize with buffer (even if empty)
-        initSound();  // Then properly load and set the buffer
-    }
-    
-    virtual ~BaseButton() = default;
-    virtual void draw(sf::RenderWindow& window) = 0;
-    virtual bool isClicked(sf::Vector2f mousePos) = 0;
-
-protected:
-    void playClickSound(float volume = 100.f) {
-        clickSound.setVolume(volume);
-        clickSound.play();
-    }
+    virtual ~IButtonBehavior() = default;
+    virtual void onClick() = 0;    // Pure virtual click handler
+    virtual void onHover() = 0;    // Pure virtual hover handler
 };
 
-// Static member initialization
-sf::SoundBuffer BaseButton::clickBuffer;
-bool BaseButton::soundLoaded = false;
-
-class Button : public BaseButton {
+// Handles visual representation (Composite Pattern)
+// Encapsulates all visual aspects of a button
+class ButtonVisual {
+protected:
+    sf::RectangleShape shape;      // Base button rectangle
+    std::unique_ptr<sf::Text> text; // Smart pointer to label text
+    sf::Color normalColor;         // Default color
+    sf::Color hoverColor;          // Mouse-over color
+    
 public:
-    Button(sf::Vector2f size, sf::Vector2f position, sf::Color color, 
-           sf::Font& font, const std::string& text);
-    ~Button();
+    // Constructor handles all visual setup
+    ButtonVisual(sf::Vector2f size, sf::Vector2f position, 
+                const sf::Color& color, const sf::Font& font,
+                const std::string& label);
+    
+    // Drawing uses SFML's drawable interface
+    void draw(sf::RenderWindow& window) const;
+    
+    // State management
+    void setHoverState(bool isHovered);
+    
+    // Hit detection using SFML's bounds checking
+    bool contains(sf::Vector2f point) const;
+};
 
-    void draw(sf::RenderWindow& window) override;
-    bool isClicked(sf::Vector2f mousePos) override;
+// Handles button sounds (Singleton-like pattern)
+// Manages shared sound resources across all buttons
+class SoundManager {
+    static sf::SoundBuffer clickBuffer; // Shared sound resource
+    static bool soundLoaded;            // Resource loading flag
+    sf::Sound clickSound;               // Instance-specific sound
+    
+public:
+    SoundManager();              // Ensures sound is loaded
+    void playClick(float volume = 100.f); // Plays click sound
+};
 
-private:
-    sf::RectangleShape buttonShape;
-    sf::Text* buttonText;
-    sf::Color buttonColor;
+// Main button class (Multiple Inheritance)
+// Combines behavior, visuals, and sound
+class Button : public IButtonBehavior, private ButtonVisual, private SoundManager {
+public:
+    // Initializes all components
+    Button(sf::Vector2f size, sf::Vector2f position, 
+          const sf::Color& color, const sf::Font& font,
+          const std::string& text);
+    
+    // Interface implementations
+    void onClick() override;  // Handles click behavior
+    void onHover() override;  // Handles hover behavior
+    
+    // Public drawing interface
+    void draw(sf::RenderWindow& window) const;
+    
+    // SFML event processing
+    bool handleEvent(const sf::Event& event, const sf::RenderWindow& window);
 };
