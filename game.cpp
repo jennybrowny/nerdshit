@@ -12,6 +12,7 @@
 ██║ ╚████║███████╗██║  ██║██████╔╝███████║██║  ██║██║   ██║  Jenny Brown 
 ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝  ECE205, Summer 2025 
 */
+
 #include "game.hpp"
 #include "button.hpp"
 #include <sstream>
@@ -32,10 +33,8 @@ SoundManager is pseudo-Singleton (static vars ≠ Singleton)
 --
 Button has dead code (IButtonBehavior isn't utilized)
 
-
-
-
 */
+
 /* 
  * =============================================
  * GAME CLASS IMPLEMENTATION 
@@ -54,8 +53,8 @@ Game::Game() :
     isMusicPlaying(false),                         // Audio state flag
     currentTutorialIndex(0),                       // Tutorial page index
     titleSprite(nullptr),                          // Title screen image
-    nextButton(nullptr),
-    prevButton(nullptr)
+    nextButton(nullptr),                           // TBD
+    prevButton(nullptr)                            // TBD
 {
     // Load tutorial images for ACT0
     std::vector<std::string> tutorialPaths = {

@@ -57,4 +57,17 @@
 // you tried manually saving it as a PNG to exact dimensions of the window but frankly looks like you auto scale it anyways
 // note to self: add sound to buttons but eh not as important as going to act 0 and having the player click through sprites
 // ----------------------------------------
-// 7/23 FINISH ACT 0
+// 7/23 - 7/24 FINISH ACT 0 -- sike bitch
+/*
+this is bullSHIT havenʻt finished ACT0 because the spirites are not loading
+going through each debug for classes and got overwhelmed 
+// ----------------------------------------
+*/
+/* 7/24 10am - 11:30am 
+handling button class, debugging went from 12 errors to 6
+- how i was calling in the text HAS AN ORDER
+- calling in a sound first when I didnʻt tell the header that it exists
+tl;dr basically im calling in shit without even considering the order or the bigger picture also my code 
+is so fucking spaggitti that instead of adding on and pushing through to finish ACT0 Iʻm backtracking to better understand
+what each class does so it doesnʻt fuck me up when Iʻm building on top of it
+*/
