@@ -47,8 +47,9 @@ Button has dead code (IButtonBehavior isn't utilized)
 Game::Game() : 
     window(sf::VideoMode({800, 600}), "NerdShit"),  // Main game window
     pageText(font, "", 24),                         // Page counter text
-    currentTutorialSprite(),                        // Current displayed image
-    bgColor(sf::Color::Black),                     // Fallback background
+    currentTutorialSprite(sf::Texture(), sf::IntRect())  // Initialize with empty texture
+                                                         // Current displayed image
+    bgColor(sf::Color::Green),                     // Fallback background
     currentScreen(START_SCREEN),                   // Initial game state
     isMusicPlaying(false),                         // Audio state flag
     currentTutorialIndex(0),                       // Tutorial page index
@@ -98,8 +99,8 @@ void Game::loadResources() {
     std::cout << "================================\n";
 
     // Font loading with fallback system
-    if (!font.loadFromFile("assets/font/times.ttf")) {
-        if (!font.loadFromFile("/System/Library/Fonts/times.ttf")) {
+    if (!font.openFromFile("assets/font/times.ttf")) {
+        if (!font.openFromFile("/System/Library/Fonts/times.ttf")) {
             std::cerr << "CRITICAL: No fonts available!" << std::endl;
             static sf::Font dummyFont;  // Fallback to prevent crashes
             font = dummyFont;
@@ -123,7 +124,7 @@ void Game::createButtons() {
     startButton = std::make_unique<Button>(
         sf::Vector2f(200, 80),        // Size
         sf::Vector2f(300, 260),       // Position (centered)
-        sf::Color::Green,             // Color
+        sf::Color::Yellow,            // Color
         font,                        // Font
         "START"                      // Label
     );

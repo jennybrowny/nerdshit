@@ -1,42 +1,36 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <functional>
+#include "button.hpp"
 #include <iostream>
 
-class Button {
-private:
-    sf::RectangleShape shape;
-    sf::Text text;
-    sf::SoundBuffer clickBuffer;
-    sf::Sound clickSound;
-    
-    sf::Color normalColor;
-    sf::Color hoverColor;
-    bool isHovered = false;
+// PROPERLY INITIALIZE ALL MEMBERS THAT NEED CONSTRUCTION
+Button::Button(sf::Vector2f size, sf::Vector2f position, 
+              sf::Color color, const sf::Font& font, 
+              const std::string& label)
+    : text(font, label, 18),       // Initialize text first
+      clickSound()                 // Then sound (buffer loaded later)
+{
+    // Setup shape
+    shape.setSize(size);
+    shape.setPosition(position);
+    shape.setFillColor(color);
 
-public:
-    Button(const sf::Vector2f& size, const sf::Vector2f& position,
-          const sf::Color& color, const sf::Font& font,
-          const std::string& label);
+    // Position text
+    text.setPosition(sf::Vector2f(position.x + 10, position.y + 5));
 
-    void draw(sf::RenderWindow& window) const;
-    bool isClicked(const sf::Vector2f& mousePos) const;
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
+    // Load sound
 
-    std::function<void()> onClick; // Click callback
-};
+// Sound fix:
+if (clickBuffer.loadFromFile("assets/sounds/button_click.mp3")) {
+        clickSound = std::make_unique<sf::Sound>(clickBuffer);  // Create WITH buffer
+        clickSound->setVolume(70);
+    } else {
+        std::cerr << "ERROR: Button sound not loaded!\n";
+    }
+}
 
-/*
-Summary of debugging 7/27 7pm - 7:35pm
-✅ Fixed Constructor Syntax
-✅ Proper Sound Initialization
-- they were in the member class cause Iʻm a stupid bitch
-✅ Robust Error Handling
-✅ Precise Text Centering
-✅ Optimized Event Detection
-✅ SFML 2.x/3.x Compatibility
-- AI does not know 2.5 vs 3.0 version 
-✅ Clean OOP Structure
-✅ Fallbacks
-- itʻs so fucking stupid how like you have to tell the computer this is a button, this is a click put them together and WOW
-*/
+bool Button::isClicked(const sf::Vector2f& mousePos) {  // Must match header
+    clicked = shape.getGlobalBounds().contains(mousePos);
+    if (clicked && clickSound) {  // Check both click state and sound
+        clickSound->play();
+    }
+    return clicked;
+}

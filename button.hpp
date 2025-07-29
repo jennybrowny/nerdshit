@@ -1,27 +1,21 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <functional>
+#include <memory>
 
 class Button {
 private:
     sf::RectangleShape shape;
     sf::Text text;
     sf::SoundBuffer clickBuffer;
-    sf::Sound clickSound;
-    
-    sf::Color normalColor;
-    sf::Color hoverColor;
-    bool isHovered = false;
+    std::unique_ptr<sf::Sound> clickSound;
+    bool clicked = false;
 
 public:
-    Button(const sf::Vector2f& size, const sf::Vector2f& position,
-          const sf::Color& color, const sf::Font& font,
+    Button(sf::Vector2f size, sf::Vector2f position, 
+          sf::Color color, const sf::Font& font, 
           const std::string& label);
-
+    
     void draw(sf::RenderWindow& window) const;
-    bool isClicked(const sf::Vector2f& mousePos) const;
-    void handleEvent(const sf::Event& event, const sf::RenderWindow& window);
-
-    std::function<void()> onClick;
+    bool isClicked(const sf::Vector2f& mousePos); // ONLY ONE DECLARATION
 };
