@@ -29,10 +29,7 @@
 Game::Game() : 
     window(sf::VideoMode({800, 600}), "NerdShit"),  // Main game window
     pageText(font, "", 24),                         // Page counter text
-   // currentTutorialSprite(sf::Texture(), sf::IntRect())  // Initialize with empty texture
-                                                         // Current displayed image
-     currentTutorialSprite()  // Leave empty for now
-
+    currentTutorialSprite(tutorialTextures[0]) // Initialize with first texture
     bgColor(sf::Color::Green),                     // Fallback background
     currentScreen(START_SCREEN),                   // Initial game state
     isMusicPlaying(false),                         // Audio state flag
@@ -148,87 +145,22 @@ void Game::createButtons() {
 // run(): Main game loop
 // -------------------------------------------------------------------
 void Game::run() {
-    // Start background music
-    auto& audio = AudioManager::getInstance();
-    audio.playMusic("background");
-    audio.setMusicLoop(true);
-    isMusicPlaying = true;
-
-    // Core game loop
+    // Initialize first state
+    currentState = std::make_unique<StartState>(font);
+    
     while (window.isOpen()) {
-        handleEvents();  // Input handling
-        update();       // Game state updates
-        render();       // Rendering
+        currentState->handleEvents(*this);
+        currentState->update(*this);
+        currentState->render(*this);
+    } // Initialize first state
+    currentState = std::make_unique<StartState>(font);
+    
+    while (window.isOpen()) {
+        currentState->handleEvents(*this);
+        currentState->update(*this);
+        currentState->render(*this);
     }
 }
-
-// -------------------------------------------------------------------
-// handleEvents(): Processes all input events (Observer)
-// -------------------------------------------------------------------
-void Game::handleEvents() {
-    sf::Event event;
-    auto& audio = AudioManager::getInstance();
-    
-    while (window.pollEvent(event)) {
-        // Window close event
-        if (event.type == sf::Event::Closed) {
-            window.close();
-        }
-
-        // Mouse click handling
-        if (event.type == sf::Event::MouseButtonPressed) {
-            auto mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-            
-            // Start screen button
-            if (currentScreen == START_SCREEN && startButton->isClicked(mousePos)) {
-                audio.playSound("click");
-                currentScreen = TUTORIAL_SCREEN;  // Transition to tutorial
-            }
-            // Tutorial screen navigation
-            else if (currentScreen == TUTORIAL_SCREEN) {
-                if (nextButton->isClicked(mousePos)) {
-                    audio.playSound("click");
-                    goToNextPage();
-                }
-                else if (prevButton->isClicked(mousePos)) {
-                    audio.playSound("click");
-                    goToPreviousPage();
-                }
-            }
-        }
-    }
-}
-
-/* 
- * =============================================
- * GAME STATE MANAGEMENT 
- * =============================================
- */
-
-// -------------------------------------------------------------------
-// goToNextPage(): Advances tutorial pages
-// -------------------------------------------------------------------
-void Game::goToNextPage() {
-    if (tutorialTextures.empty()) return;
-    
-    // Circular navigation through pages
-    currentTutorialIndex = (currentTutorialIndex + 1) % tutorialTextures.size();
-    currentTutorialSprite.setTexture(tutorialTextures[currentTutorialIndex]);
-    updatePageIndicator();  // Update page counter display
-}
-
-// -------------------------------------------------------------------
-// goToPreviousPage(): Returns to previous tutorial pages
-// -------------------------------------------------------------------
-void Game::goToPreviousPage() {
-    if (tutorialTextures.empty()) return;
-    
-    // Circular navigation with underflow protection
-    currentTutorialIndex = (currentTutorialIndex - 1 + tutorialTextures.size()) % tutorialTextures.size();
-    currentTutorialSprite.setTexture(tutorialTextures[currentTutorialIndex]);
-    updatePageIndicator();
-}
-
 // -------------------------------------------------------------------
 // update(): Handles frame-by-frame game logic
 // -------------------------------------------------------------------
@@ -244,45 +176,6 @@ void Game::update() {
     }
 }
 
-/* 
- * =============================================
- * RENDERING FUNCTIONS
- * =============================================
- */
-
-// -------------------------------------------------------------------
-// render(): Draws all game elements
-// -------------------------------------------------------------------
-void Game::render() {
-    window.clear(bgColor);
-
-    switch (currentScreen) {
-        case START_SCREEN:
-            if (titleSprite) window.draw(*titleSprite);
-            startButton->draw(window);
-            break;
-
-        case TUTORIAL_SCREEN:
-            window.draw(currentTutorialSprite);
-            
-            // Conditional button visibility
-            if (currentTutorialIndex > 0) {
-                prevButton->draw(window);
-            }
-            if (currentTutorialIndex < tutorialTextures.size() - 1) {
-                nextButton->draw(window);
-            }
-            
-            window.draw(pageText);  // Page counter
-            break;
-
-        case QUIZ_SCREEN:
-            // Reserved for future implementation
-            break;
-    }
-
-    window.display();
-}
 
 /* 
  * =============================================

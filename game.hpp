@@ -4,17 +4,8 @@
 #include "button.hpp"
 #include "audio_manager.hpp"  
 #include <memory>
-
-/*----------------------------------------------
- *  GAME STATE MANAGEMENT
- *  Tracks which screen is currently active
- *--------------------------------------------*/
-enum ScreenState {
-    START_SCREEN,    // Initial title screen
-    TUTORIAL_SCREEN, // Slideshow of tutorial images
-    QUIZ_SCREEN      // Future quiz functionality
-};
-
+#include "states/game_state.hpp"
+#include <memory>
 /*----------------------------------------------
  *  MAIN GAME CLASS
  *  Manages all game systems and rendering
@@ -57,6 +48,8 @@ private:
     
     // Updates the "X/Y" page indicator text
     void updatePageIndicator();
+    std::unique_ptr<GameState> currentState;
+
 
 public:
     //=========== LIFECYCLE METHODS ===========//
@@ -74,7 +67,19 @@ public:
     void render();        // Draws everything to window
 
     //=========== TUTORIAL NAVIGATION ===========//
+   
     void goToNextPage();     // Advances to next tutorial slide
     void goToPreviousPage(); // Returns to previous slide
+// adding game state management
+    sf::RenderWindow& getWindow() { return window; }
+    sf::Font& getFont() { return font; }
+    std::unique_ptr<sf::Sprite>& getTitleSprite() { return titleSprite; }
+
+    void changeState(std::unique_ptr<GameState> newState);
+
+    std::vector<sf::Texture>& getTextures() { return tutorialTextures; }
+    void changeState(std::unique_ptr<GameState> newState) {
+        currentState = std::move(newState);
+    }
 };
 

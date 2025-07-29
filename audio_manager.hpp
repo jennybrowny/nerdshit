@@ -15,7 +15,9 @@ public:
      */
     void loadMusic(const std::string& key, const std::string& path);
 
-
+float getMusicVolume() const;
+void setMusicVolume(float volume);
+void stopMusic(const std::string& key = "");
 
     /**
      * Plays the music associated with the given key.

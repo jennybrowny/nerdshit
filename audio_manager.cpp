@@ -17,6 +17,18 @@ void AudioManager::playMusic(const std::string& key) {
     musicMap[key].play();
     
 }
+
+float AudioManager::getMusicVolume() const {
+    return musicMap.empty() ? 0 : musicMap.begin()->second.getVolume();
+}
+
+void AudioManager::stopMusic(const std::string& key) {
+    if (key.empty()) {
+        for (auto& pair : musicMap) pair.second.stop();
+    } else {
+        musicMap[key].stop();
+    }
+}
 // Load sound effect from file and associate with key
 // Throws std::runtime_error if loading fails
 void AudioManager::loadSound(const std::string& key, const std::string& path) {
