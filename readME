@@ -1,0 +1,79 @@
+// Nerdshit log of edits cause I canʻt remember shit
+// used Replit, Deepseek
+
+// ----------------------------------------
+// 7/21: 7 PM - 10 PM 
+// Wins: 
+// Game fucking compiles HOLY LEE SHIT AFTER THREE FUCKING WEEKS
+// Window is created (thanks Herve)
+// Window can upload a background image of nerd central
+// Start button created to go to introduction 
+
+// [TO DO 7/22, 3-5 Hours]
+// - Introduction ACT 0?
+// - Background sprite of bedroom with storytime spirtes to introduce the player to the game
+// - Dr. Song Choi sprite with his dialouge sprite because textboxes look P.O.O.R!
+// - Transitions to ACT 1: Mangoman ECE160  [ideal]
+// realistic: base min is you get up to Dr. Choi 
+
+// note to self: focus on above ^^ --- everything else future me problem
+// use your resources, touch grass, balance but remember
+// youʻve wrote a grant in 4 days... and got funded (fuck you Dutra you almost fucked me over)... 
+// you AI your way through your x496 with min help from Dr. Paul Schmiit Ph.D and you know what he said?
+// "I believe in you" (just like Herve) but ngl he just didnʻt want to look at your code cause it was "spagghetti code" 
+// but you did it anyways and YOU CAN DO IT AGAIN! 
+// ----------------------------------------
+
+// ----------------------------------------
+// 7/22 2 PM - 4:52 PM
+// Wins: 
+// Refined used of classes: game, button (button looks great!)
+// Composition added: game contains button
+// Design patterns: use of statepatterns (start_screen, tutorial_Screen)
+// added sound onto start screen, buttons yay!
+//---
+// to do: the remaining issues are primarily API fixes and path validation. 
+// Gaps: still no inheritance (need screen class, ADD)
+// probably why tutorial is being whack
+// note to self: youʻre building a solid foundation of the core mechinanics now itʻs girlypoppifying it
+// you see the vision, you see the end goal, you see the light at the end of the tunnel. DO IT.
+// ----------------------------------------
+
+// ----------------------------------------
+// 7/22  7PM - 10:43 PM | Gaps: still no inheritance (need screen class, ADD)
+// Wins: 
+// - BROKE THE FUCKING GAME but then got it to work again but lesser... loaded it back up
+// - making progress on button inhertiance! Woot woot, like had to strip it but itʻs worth a decent chunk of points
+//---
+// GAPS OKAY SOME HOW I REMOVED THE FUCKING SOUND FROM BUTTONS 2 steps back one step forward
+// - Need to fix sound on button click but make it an good damn inhertiance class 
+// - start on report and ACT I NOW get those pages going! Throw that shit into GPT 
+//    - find out how to structure ACT 0 intsro rubric using design patterns 
+//    - Another button... 
+//    - put a pin on the button sound just get through Act 0 
+// NEXT STEPS: ACT 0 
+// go to game.cpp, your goal is to get one turtoial sprite on the screen (ACT1_01.PNG)
+// scaling must likely the issue, solve it and have it fit in termial
+// you tried manually saving it as a PNG to exact dimensions of the window but frankly looks like you auto scale it anyways
+// note to self: add sound to buttons but eh not as important as going to act 0 and having the player click through sprites
+// ----------------------------------------
+// 7/23 - 7/24 FINISH ACT 0 -- sike bitch
+/*
+this is bullSHIT havenʻt finished ACT0 because the spirites are not loading
+going through each debug for classes and got overwhelmed 
+// ----------------------------------------
+*/
+/* 7/24 10am - 11:30am 
+handling button class, debugging went from 12 errors to 6
+- how i was calling in the text HAS AN ORDER
+- calling in a sound first when I didnʻt tell the header that it exists
+tl;dr basically im calling in shit without even considering the order or the bigger picture also my code 
+is so fucking spaggitti that instead of adding on and pushing through to finish ACT0 Iʻm backtracking to better understand
+what each class does so it doesnʻt fuck me up when Iʻm building on top of it
+*/
+/*
+// ----------------------------------------
+7/26 7pm - 9:33pm
+fixing button class turns out i fucked it up, the code works but my class for button doesnʻt 20+
+errors. FUCK.
+*/
