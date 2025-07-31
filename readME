@@ -77,3 +77,20 @@ what each class does so it doesnʻt fuck me up when Iʻm building on top of it
 fixing button class turns out i fucked it up, the code works but my class for button doesnʻt 20+
 errors. FUCK.
 */
+7/29 7pm - 12:00 am 
+- buttons still not working 
+- BUT itʻs the rubric. the rubric my dear that determines, youʻll get the screens going back 
+- you have to literally redo the whole structure just like w/ dr paul schmitt phd
+- youʻre not focusin on the chaos or substance but orgization. Trial and error.
+- you donʻt have alot of time but you can lock in. 
+to do 
+State Transition System
+
+Ensure StartState → TutorialState works
+
+Implement proper TutorialState rendering
+
+Remove Code Duplication
+
+Especially in Game::run() and audio manager
+*/

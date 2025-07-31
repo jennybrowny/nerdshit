@@ -2,6 +2,9 @@
 #include "button.hpp" // Buttons
 #include <sstream> // For page number text
 #include <iostream>
+#include "states/start_state.hpp"
+#include "states/tutorial_state.hpp"
+
 
 
 /* 
@@ -13,10 +16,7 @@
 ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝  ECE205, Summer 2025 
 */
 
-#include "game.hpp"
-#include "button.hpp"
-#include <sstream>
-#include <iostream>
+
 /* 
  * =============================================
  * GAME CLASS IMPLEMENTATION 
@@ -29,14 +29,14 @@
 Game::Game() : 
     window(sf::VideoMode({800, 600}), "NerdShit"),  // Main game window
     pageText(font, "", 24),                         // Page counter text
-    currentTutorialSprite(tutorialTextures[0]) // Initialize with first texture
-    bgColor(sf::Color::Green),                     // Fallback background
-    currentScreen(START_SCREEN),                   // Initial game state
+    currentTutorialSprite(tutorialTextures[0]), // Initialize with first texture
+    bgColor(sf::Color::Green), // Fixed typo (was bgColorsf)
+    currentState(nullptr),                   // Initial game state 
     isMusicPlaying(false),                         // Audio state flag
     currentTutorialIndex(0),                       // Tutorial page index
     titleSprite(nullptr),                          // Title screen image
     nextButton(nullptr),                           // TBD
-    prevButton(nullptr)                            // TBD
+    prevButton(nullptr),                          // TBD
 {
     // Load tutorial images for ACT0
     std::vector<std::string> tutorialPaths = {
@@ -55,11 +55,8 @@ Game::Game() :
         }
     }
 
-    // Initialize first tutorial page if loaded
-    if (!tutorialTextures.empty()) {
-        currentTutorialSprite.setTexture(tutorialTextures[0]);
-        scaleSpriteToWindow(currentTutorialSprite);
-    }
+    currentTutorialSprite,  // Default construct first
+    bgColorsf::Color::Green, // Default background color
 
     loadResources();    // Load fonts, audio, etc.
     createButtons();    // Initialize UI buttons
@@ -80,14 +77,12 @@ void Game::loadResources() {
     std::cout << "================================\n";
 
     // Font loading with fallback system
-    if (!font.openFromFile("assets/font/times.ttf")) {
-        if (!font.openFromFile("/System/Library/Fonts/times.ttf")) {
-            std::cerr << "CRITICAL: No fonts available!" << std::endl;
-            static sf::Font dummyFont;  // Fallback to prevent crashes
-            font = dummyFont;
-        }
+if (!font.openFromFile("assets/fonts/arial.ttf")) {
+    std::cerr << "Main font failed, trying system fallback...\n";
+    if (!font.openFromFile("/System/Library/Fonts/Arial.ttf")) {
+        throw std::runtime_error("Critical: No fonts available");
     }
-
+}
     // Title screen setup
     if (titleTexture.loadFromFile("assets/background/title_screen.png")) {
         titleSprite = std::make_unique<sf::Sprite>(titleTexture);
@@ -144,16 +139,9 @@ void Game::createButtons() {
 // -------------------------------------------------------------------
 // run(): Main game loop
 // -------------------------------------------------------------------
+
 void Game::run() {
-    // Initialize first state
-    currentState = std::make_unique<StartState>(font);
-    
-    while (window.isOpen()) {
-        currentState->handleEvents(*this);
-        currentState->update(*this);
-        currentState->render(*this);
-    } // Initialize first state
-    currentState = std::make_unique<StartState>(font);
+    currentState = std::make_unique<StartState>(font); // Single initialization
     
     while (window.isOpen()) {
         currentState->handleEvents(*this);
@@ -187,7 +175,7 @@ void Game::update() {
 // scaleSpriteToWindow(): Fits sprites to window size
 // -------------------------------------------------------------------
 void Game::scaleSpriteToWindow(sf::Sprite& sprite) {
-    sf::FloatRect bounds = sprite.getLocalBounds();
+    auto bounds = sprite.getGlobalBounds();
     sprite.setScale(
         window.getSize().x / bounds.width,
         window.getSize().y / bounds.height
@@ -201,4 +189,20 @@ void Game::updatePageIndicator() {
     std::stringstream ss;
     ss << (currentTutorialIndex + 1) << "/" << tutorialTextures.size();
     pageText.setString(ss.str());
+}
+
+// -------------------------------------------------------------------
+// goToNextPage(): Advances to the next tutorial slide
+// -------------------------------------------------------------------
+void Game::goToPreviousPage() {
+    if (!tutorialTextures.empty()) {
+        currentTutorialIndex = (currentTutorialIndex - 1 + tutorialTextures.size()) % tutorialTextures.size();
+    }
+}
+// -------------------------------------------------------------------
+// changeState(): Changes the current game state
+// -------------------------------------------------------------------
+// This allows switching between different game states like Start, Tutorial, etc.
+void Game::changeState(std::unique_ptr<GameState> newState) {
+    currentState = std::move(newState);
 }

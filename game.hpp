@@ -10,6 +10,7 @@
  *  MAIN GAME CLASS
  *  Manages all game systems and rendering
  *--------------------------------------------*/
+
 class Game {
 private:
     
@@ -30,10 +31,7 @@ private:
     std::unique_ptr<Button> startButton; // Begins the tutorial
     std::unique_ptr<Button> nextButton;  // Advances slides
     std::unique_ptr<Button> prevButton;  // Goes back slides
-    
-    //=========== GAME STATE ===========//
-    ScreenState currentScreen;  // Tracks active screen (START/TUTORIAL(ACT0)/QUIZ(ACT1))
-    
+
     //=========== AUDIO SYSTEM ===========//
     sf::Music introMusic;       // Background music
     bool isMusicPlaying;        // Music state flag
@@ -67,16 +65,18 @@ public:
     void render();        // Draws everything to window
 
     //=========== TUTORIAL NAVIGATION ===========//
-   
-    void goToNextPage();     // Advances to next tutorial slide
-    void goToPreviousPage(); // Returns to previous slide
+void goToPreviousPage();
+void changeState(std::unique_ptr<GameState> newState);
+
+
+
+
+
+
 // adding game state management
     sf::RenderWindow& getWindow() { return window; }
     sf::Font& getFont() { return font; }
     std::unique_ptr<sf::Sprite>& getTitleSprite() { return titleSprite; }
-
-    void changeState(std::unique_ptr<GameState> newState);
-
     std::vector<sf::Texture>& getTextures() { return tutorialTextures; }
     void changeState(std::unique_ptr<GameState> newState) {
         currentState = std::move(newState);
