@@ -8,14 +8,16 @@ class AudioManager {
 public:
     // Singleton pattern to ensure only one instance of AudioManager exists
     static AudioManager& getInstance();
-    
+
     /**
      * Loads music from a file and associates it with a key.
      * Throws std::runtime_error if loading fails.
      */
     void loadMusic(const std::string& key, const std::string& path);
 
-
+float getMusicVolume() const;
+void setMusicVolume(float volume);
+void stopMusic(const std::string& key = "");
 
     /**
      * Plays the music associated with the given key.
@@ -23,6 +25,10 @@ public:
      */
     void playMusic(const std::string& key);
 
+    /**
+     * Sets whether music should loop continuously
+     */
+    void setMusicLoop(const std::string& key, bool loop);
 
     /**
      * Loads a sound effect from a file and associates it with a key.
@@ -36,7 +42,7 @@ public:
      */
 
     void playSound(const std::string& key);
-    
+
 private:
     // Private constructor prevents direct instantiation (Singleton pattern)
     AudioManager() = default;

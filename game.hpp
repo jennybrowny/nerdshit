@@ -2,26 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include "button.hpp"
-#include "audio_manager.hpp"  
+#include "audio_manager.hpp"
 #include <memory>
+#include "states/game_state.hpp"
 
-/*----------------------------------------------
- *  GAME STATE MANAGEMENT
- *  Tracks which screen is currently active
- *--------------------------------------------*/
-enum ScreenState {
-    START_SCREEN,    // Initial title screen
-    TUTORIAL_SCREEN, // Slideshow of tutorial images
-    QUIZ_SCREEN      // Future quiz functionality
-};
-
-/*----------------------------------------------
- *  MAIN GAME CLASS
- *  Manages all game systems and rendering
- *--------------------------------------------*/
 class Game {
 private:
-    
     //=========== CORE SYSTEMS ===========//
     sf::RenderWindow window;    // Main game window
     sf::Color bgColor;          // Background fallback color
@@ -32,48 +18,54 @@ private:
     
     //=========== TUTORIAL SYSTEM ===========//
     std::vector<sf::Texture> tutorialTextures; // All tutorial slide images
-    sf::Sprite currentTutorialSprite;          // Currently displayed slide
+    std::unique_ptr<sf::Sprite> currentTutorialSprite; // Currently displayed slide
     unsigned int currentTutorialIndex;         // Current slide position
     
     //=========== UI ELEMENTS ===========//
     std::unique_ptr<Button> startButton; // Begins the tutorial
     std::unique_ptr<Button> nextButton;  // Advances slides
     std::unique_ptr<Button> prevButton;  // Goes back slides
-    
-    //=========== GAME STATE ===========//
-    ScreenState currentScreen;  // Tracks active screen (START/TUTORIAL(ACT0)/QUIZ(ACT1))
-    
+
     //=========== AUDIO SYSTEM ===========//
-    sf::Music introMusic;       // Background music
     bool isMusicPlaying;        // Music state flag
     
     //=========== TEXT SYSTEM ===========//
     sf::Font font;              // Main UI font
     sf::Text pageText;          // "X/Y" page counter
+    bool fontLoaded;            // Track if font was successfully loaded
+
+    // State management
+    std::unique_ptr<GameState> currentState;
 
     //---------- PRIVATE HELPERS ----------//
-    // Scales sprites to fit window dimensions
     void scaleSpriteToWindow(sf::Sprite& sprite);
-    
-    // Updates the "X/Y" page indicator text
     void updatePageIndicator();
 
 public:
     //=========== LIFECYCLE METHODS ===========//
-    Game();   // Constructor - Initializes all systems
-    ~Game();  // Destructor  - Cleans up resources
-    void run(); // Main game loop
+    Game();
+    ~Game();
+    void run();
 
     //=========== RESOURCE MANAGEMENT ===========//
-    void loadResources();   // Loads textures, fonts, audio
-    void createButtons();   // Sets up UI buttons
+    void loadResources();
+    void createButtons();
 
     //=========== GAME LOOP SYSTEMS ===========//
-    void handleEvents();  // Processes SFML events (input etc)
-    void update();        // Game state updates (logic)
-    void render();        // Draws everything to window
+    void handleEvents();
+    void update();
+    void render();
 
     //=========== TUTORIAL NAVIGATION ===========//
-    void goToNextPage();     // Advances to next tutorial slide
-    void goToPreviousPage(); // Returns to previous slide
+    void goToPreviousPage();
+    void goToNextPage();
+    void changeState(std::unique_ptr<GameState> newState);
+
+    //=========== GETTERS ===========//
+    sf::RenderWindow& getWindow() { return window; }
+    sf::Font& getFont() { return font; }
+    std::unique_ptr<sf::Sprite>& getTitleSprite() { return titleSprite; }
+    std::vector<sf::Texture>& getTextures() { return tutorialTextures; }
+    std::unique_ptr<sf::Sprite>& getCurrentTutorialSprite() { return currentTutorialSprite; }
+    AudioManager& getAudioManager() { return AudioManager::getInstance(); }
 };
