@@ -77,6 +77,7 @@ what each class does so it doesnʻt fuck me up when Iʻm building on top of it
 fixing button class turns out i fucked it up, the code works but my class for button doesnʻt 20+
 errors. FUCK.
 */
+/*
 7/29 7pm - 12:00 am 
 - buttons still not working 
 - BUT itʻs the rubric. the rubric my dear that determines, youʻll get the screens going back 
@@ -94,6 +95,7 @@ Remove Code Duplication
 
 Especially in Game::run() and audio manager
 */
+/*
 7/30 
 so the classes are all stupid and i added states BUT it keeps going to the next page and I am
 dead ass unsure if itʻs actually going to the next state and going in that loop
@@ -104,4 +106,31 @@ will do that later today... to be rebuilt you must burn it down first.
 You did it before with Dr. Paul Schmitt PhD you. can. do. it. again. Remember what he said:
 "I believe"
 // ----------------------------------------
-8/1 8:04 PM - 
+8/1 8:04 PM - 11:40 PM. 
+OMG IT WORKS. HOLY LEE FUCK. IT WORKS. THE STUPID ASS LINKER DIDNT LINK 
+THEN THE SPRITES WASNT LOADING THAN THE STUPID ASS HEADERS WASNT IN THE RIGHT DIRECTORY.
+MANGOMAN DR PAUL SCHMITT PHD UR RIGHT. I MUST BELIEVE!!!! I MUST BELIEVE!!!
+These dainty tims hands do work and so does 2 shots of esspresso.
+THIS IS A HUGE WIN, Iʻm going to go to the loi patch, pick Mikayla up and touch mud
+cause what. the. fuck. 
+
+Next steps: 
+- have sprites auto scale (just a function so u dont have to scale EVERY SINGLE TIME FOR EACH CLASS)
+- fix font and stupid button class to display proprely 
+- refer to rubric to modify 
+
+next next steps: 
+- have mangoman load up and get some more whack ass buttons refer to rubric 
+- future me problem to be honest
+*/
+/* 8/2 12:30 PM - 
++ audio manager plays
++ loop is better
+- fix intro sprite 
+- fix loop sprite and button (u noticed a delay) loop for act0
+- fix ugly ass buttons (something is up with the compiler or how the buttons are being drawn in act0)
+
+
+*/
+
+
