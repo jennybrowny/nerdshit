@@ -1,36 +1,66 @@
 
-#include "states/start_state.hpp"
+
+#include <fstream> 
 #include "game.hpp" 
-#include "states/tutorial_state.hpp"
 #include <iostream>
+#include "states/start_state.hpp"
+#include "states/credits_state.hpp"
+#include "states/tutorial_state.hpp"
 
 StartState::StartState(sf::Font& font) {
     std::cout << "=== StartState Constructor Called ===" << std::endl;
 
-    // Only create button if font is valid
+    // menu buttons 
     try {
         std::cout << "Attempting to create start button..." << std::endl;
         startButton = std::make_unique<Button>(
             sf::Vector2f(200, 80),
             sf::Vector2f(300, 260),
-            sf::Color::Yellow,
+            sf::Color::Green,
             font,
-            "START"
+            "NEW GAME"
         );
-        std::cout << "Start button created successfully!" << std::endl;
-    } catch (const std::exception& e) {
-        std::cout << "ERROR: Could not create start button - " << e.what() << std::endl;
-    } catch (...) {
-        std::cout << "ERROR: Unknown error creating start button" << std::endl;
-    }
+        // Save button (centered below start button)
+        saveButton = std::make_unique<Button>(
+        sf::Vector2f(200, 80),    // Slightly smaller than start button
+        sf::Vector2f(300, 350),   // Positioned below start button
+        sf::Color::Blue, 
+        font,
+        "SAVED"
+    );
 
+// credits button 
+        creditsButton = std::make_unique<Button>(
+            sf::Vector2f(200, 80),
+            sf::Vector2f(300, 440),
+            sf::Color::Transparent,
+            font,
+            "CREDITS"
+        );
+        creditsButton->setOutlineEnabled(false); // Disable outline for this button only
+        creditsButton->setHoverColor(sf::Color::Yellow);  // Make credits glow when hovered!
+        std::cout << "Menu buttons created successfully!" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "ERROR: Could not create nerdshit buttons - " << e.what() << std::endl;
+    } 
     std::cout << "StartState constructor completed. Button exists: " << (startButton ? "YES" : "NO") << std::endl;
 }
 
 void StartState::handleEvents(Game& game) {
     std::cout << "StartState::handleEvents called" << std::endl;
-    
-    // SFML 3.0 event handling
+        sf::Vector2f mousePos = game.getWindow().mapPixelToCoords(sf::Mouse::getPosition(game.getWindow()));
+    if (saveButton->isClicked(mousePos)) {
+        std::ofstream saveFile("save.dat");
+        saveFile << "TUTORIAL_PAGE:" << game.getCurrentTutorialIndex();
+        AudioManager::getInstance().playSound("click");
+    }
+   
+if (creditsButton && creditsButton->isClicked(mousePos)) {
+    std::cout << "CREDITS button clicked! Prepare for fame!" << std::endl;
+    AudioManager::getInstance().playSound("click");
+    game.changeState(std::make_unique<CreditsState>(game.getFont()));
+}
+
     while (auto event = game.getWindow().pollEvent()) {
         std::cout << "Processing event..." << std::endl;
         
@@ -65,7 +95,10 @@ void StartState::update(Game& game) {
 
 void StartState::render(Game& game) {
     std::cout << "StartState::render called" << std::endl;
-    
+        sf::Vector2f mousePos = game.getWindow().mapPixelToCoords(
+        sf::Mouse::getPosition(game.getWindow())
+    );
+    startButton->update(mousePos); // Update hover state
     // Clear the window first
     game.getWindow().clear(sf::Color::Black);
 
@@ -81,13 +114,20 @@ void StartState::render(Game& game) {
         game.getWindow().draw(background);
     }
 
-    // Draw start button if available
+    // Draw start, save, credit button on the menu 
     if (startButton) {
         std::cout << "Drawing start button" << std::endl;
         startButton->draw(game.getWindow());
-    } else {
-        std::cout << "No start button to draw" << std::endl;
+    } 
+        if (saveButton) { 
+        std::cout << "Drawing save button" << std::endl;
+        saveButton->draw(game.getWindow());
     }
+     if (creditsButton) { 
+        std::cout << "Drawing credits button" << std::endl;
+        creditsButton->draw(game.getWindow());
+    }
+
 
     // Display everything
     game.getWindow().display();

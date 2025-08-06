@@ -9,5 +9,9 @@ public:
     void update(Game& game) override;
     void render(Game& game) override;
 private:
-    std::unique_ptr<Button> startButton;
+    std::unique_ptr<Button> startButton; // Button to start the game
+    std::unique_ptr<Button> saveButton;  // Button to save the game state (placeholder)
+    // button for credits cause why not
+    std::unique_ptr<Button> creditsButton; // Add this line
+    // Add any other UI elements needed for the start state
 };

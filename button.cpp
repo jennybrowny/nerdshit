@@ -1,4 +1,3 @@
-// button.cpp
 #include "button.hpp"
 #include <iostream>
 
@@ -6,26 +5,20 @@ Button::Button(sf::Vector2f size, sf::Vector2f position,
               sf::Color color, const sf::Font& font, 
               const std::string& label)
     : shape(),
-      text(font, label, 24), // Initialize with label, font and size
-      clickSound(),
+      text(font, label, 24),
       normalColor(color),
       hoverColor(color.r + 30, color.g + 30, color.b + 30)
 {
-    // Setup button shape
     shape.setSize(size);
     shape.setPosition(position);
     shape.setFillColor(normalColor);
     shape.setOutlineThickness(2.f);
     shape.setOutlineColor(sf::Color::White);
 
-    // Setup text properties
     text.setFillColor(sf::Color::White);
     text.setStyle(sf::Text::Bold);
-    
-    // Center the text on the button
     centerTextOnButton();
 
-    // Load click sound
     if (clickBuffer.loadFromFile("assets/sounds/button_click.mp3")) {
         clickSound = std::make_unique<sf::Sound>(clickBuffer);
         clickSound->setVolume(70);
@@ -33,7 +26,6 @@ Button::Button(sf::Vector2f size, sf::Vector2f position,
         std::cerr << "ERROR: Button sound not loaded!\n";
     }
 }
-
 
 void Button::centerTextOnButton() {
     // Get the text bounds (SFML 3.0 style)
@@ -69,11 +61,11 @@ bool Button::isClicked(const sf::Vector2f& mousePos) {
 }
 
 
-void Button::update(const sf::Vector2f& mousePos) {  // makes it pretty when you hover over it
+void Button::update(const sf::Vector2f& mousePos) {
     if (isHovered(mousePos)) {
-        shape.setFillColor(hoverColor);
+        shape.setFillColor(hoverColor); // Glow color
     } else {
-        shape.setFillColor(normalColor);
+        shape.setFillColor(normalColor); // Default color
     }
 }
 
