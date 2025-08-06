@@ -68,10 +68,15 @@ bool Button::isClicked(const sf::Vector2f& mousePos) {
     return clicked;
 }
 
-void Button::update(const sf::Vector2f& mousePos) {
-    if (shape.getGlobalBounds().contains(mousePos)) {
+
+void Button::update(const sf::Vector2f& mousePos) {  // makes it pretty when you hover over it
+    if (isHovered(mousePos)) {
         shape.setFillColor(hoverColor);
     } else {
         shape.setFillColor(normalColor);
     }
+}
+
+bool Button::isHovered(const sf::Vector2f& mousePos) const {
+    return shape.getGlobalBounds().contains(mousePos);
 }

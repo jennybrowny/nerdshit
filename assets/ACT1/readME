@@ -1,0 +1,27 @@
+outline 
+so after act0 the player is prompted to contʻd to ACT1 where they are introduced to Dr. Choi and Mangoman
+
+Dr. Choi: "hello there! Welcome to the College of Engineering, itʻs 1:30 PM you better head off to HIG110 for your first real engineering class, ECE160 - good luck!" 
+- villager sound, /assests/sounds/choi.ogg
+
+Mangoman: 
+has the player do some nerdshit, tie it back to a core concept in ECE205, basic save system from states is introduced
+
+ACT1 builds from ACT0 addressing key gaps in the rubric:
+
+Inheritance/Composition (10pts)
+
++ IconButton inherits from Button + uses composition (sf::Sprite)
+============================================================================================================
+Design Patterns (15pts)
+
++ Observer (AudioManager events) + Memento (SaveSystem)
+============================================================================================================
+
+Functionality (15pts)
+
++  ACT0 → ACT1 transition + basic save system**
+============================================================================================================
+
+Use of Classes (15pts)
++ Clear OOP (Kapuna hierarchy, specialized buttons)

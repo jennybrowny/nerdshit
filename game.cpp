@@ -4,6 +4,7 @@
 #include <iostream>
 #include "states/start_state.hpp"
 #include "states/tutorial_state.hpp"
+#include "resource_manager.hpp"
 
 /* 
 ███╗   ██╗███████╗██████╗ ██████╗ ███████╗██╗  ██╗██╗████████╗
@@ -31,8 +32,6 @@ Game::Game() :
     isMusicPlaying(false),                         // Audio state flag
     currentTutorialIndex(0),                       // Tutorial page index
     titleSprite(nullptr),                          // Title screen image
-    nextButton(nullptr),                           // TBD
-    prevButton(nullptr),                           // TBD
     fontLoaded(false)                              // Font loading state
 {
     // Load tutorial images for ACT0
@@ -43,23 +42,25 @@ Game::Game() :
         "assets/ACT0/ACT01_3.PNG" // last image
     };
 
-    // Load each image file into textures
+    // Get resource manager instance
+    auto& resMgr = ResourceManager::getInstance();
+
+    // Load all tutorial textures through ResourceManager
     for (const auto& path : tutorialPaths) {
-        sf::Texture texture;
-        if (texture.loadFromFile(path)) {
-            tutorialTextures.push_back(texture);
-            
-            // Create sprite with first texture
-            if (!currentTutorialSprite && !tutorialTextures.empty()) {
-                currentTutorialSprite = std::make_unique<sf::Sprite>(tutorialTextures[0]);
-                scaleSpriteToWindow(*currentTutorialSprite);
-            }
-        }
+        tutorialTextures.push_back(resMgr.getTexture(path));
     }
 
+    // Create sprite with first texture if available
+    if (!currentTutorialSprite && !tutorialTextures.empty()) {
+        currentTutorialSprite = std::make_unique<sf::Sprite>(tutorialTextures[0]);
+        scaleSpriteToWindow(*currentTutorialSprite);
+    }
+
+    // Load other resources (fonts, audio, etc.)
     loadResources();
-    createButtons();
 }
+
+
 
 Game::~Game() {
     // Smart pointers automatically clean up
@@ -72,11 +73,6 @@ void Game::loadResources() {
     audio.loadMusic("background", "assets/sounds/Intro.mp3");
     audio.loadMusic("act0", "assets/sounds/ACT0.mp3");
     audio.loadSound("click", "assets/sounds/button_click.mp3");
-
-    std::cout << "================================\n";
-    std::cout << "||        LOADING ASSETS      ||\n";
-    std::cout << "================================\n";
-
     fontLoaded = false;
     std::vector<std::string> fontPaths = {
         "arial.ttf",
@@ -85,13 +81,17 @@ void Game::loadResources() {
         "/System/Library/Fonts/Helvetica.ttc"
     };
 
-    for (const auto& path : fontPaths) {
-        if (font.openFromFile(path)) {
-            std::cout << "Successfully loaded font: " << path << std::endl;
-            fontLoaded = true;
-            break;
-        }
+auto& resMgr = ResourceManager::getInstance();
+for (const auto& path : fontPaths) {
+    try {
+        font = resMgr.getFont(path);
+        std::cout << "Successfully loaded font: " << path << std::endl;
+        fontLoaded = true;
+        break;
+    } catch (const std::exception& e) {
+        std::cout << "Failed to load font: " << path << " - " << e.what() << std::endl;
     }
+}
 
     if (!fontLoaded) {
         std::cout << "Warning: No fonts loaded - text will not display properly" << std::endl;
@@ -108,47 +108,10 @@ void Game::loadResources() {
         bgColor = sf::Color(50, 100, 150);
     }
 }
-
-void Game::createButtons() {
-    if (fontLoaded) {
-    startButton = std::make_unique<Button>(
-    sf::Vector2f(200, 60),  // Slightly slimmer button
-    sf::Vector2f(
-        window.getSize().x / 2 - 100,  // Center horizontally (200 width / 2)
-        400                            // Position vertically
-    ),
-    sf::Color(0, 150, 0),   // Dark green background
-    font,
-    "START"
-);
-
-        nextButton = std::make_unique<Button>(
-            sf::Vector2f(120, 50),
-            sf::Vector2f(650, 530),
-            sf::Color(0, 150, 200),
-            font,
-            "Next"
-        );
-
-        prevButton = std::make_unique<Button>(
-            sf::Vector2f(120, 50),
-            sf::Vector2f(30, 530),
-            sf::Color(200, 100, 0),
-            font,
-            "Back"
-        );
-    } else {
-        std::cout << "Warning: Buttons will not display properly without fonts" << std::endl;
-    }
-
-    if (fontLoaded) {
-        pageText.setFont(font);
-        pageText.setCharacterSize(24);
-        pageText.setFillColor(sf::Color::White);
-        pageText.setPosition(sf::Vector2f(400, 550));
-    }
-}
-
+// run the game loop 
+// -------------------------------------------------------------------
+// Main game loop that handles events, updates state, and renders graphics
+// -------------------------------------------------------------------
 void Game::run() {
     std::cout << "=== STARTING GAME LOOP ===" << std::endl;
     std::cout << "Font loaded: " << (fontLoaded ? "YES" : "NO") << std::endl;
@@ -179,8 +142,6 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    startButton->update(mousePos);  
     auto& audio = AudioManager::getInstance();
     float vol = audio.getMusicVolume();
     if (vol > 5.f) {
@@ -192,7 +153,8 @@ void Game::update() {
 }
 
 void Game::render() {
-    // Delegated to current state
+    window.clear();
+    window.display();
 }
 
 void Game::scaleSpriteToWindow(sf::Sprite& sprite) {
@@ -249,3 +211,4 @@ void Game::changeState(std::unique_ptr<GameState> newState) {
     }
     currentState = std::move(newState);
 }
+

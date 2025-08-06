@@ -6,6 +6,7 @@
 #include <memory>
 #include "states/game_state.hpp"
 
+
 class Game {
 private:
     //=========== CORE SYSTEMS ===========//
@@ -20,11 +21,6 @@ private:
     std::vector<sf::Texture> tutorialTextures; // All tutorial slide images
     std::unique_ptr<sf::Sprite> currentTutorialSprite; // Currently displayed slide
     unsigned int currentTutorialIndex;         // Current slide position
-    
-    //=========== UI ELEMENTS ===========//
-    std::unique_ptr<Button> startButton; // Begins the tutorial
-    std::unique_ptr<Button> nextButton;  // Advances slides
-    std::unique_ptr<Button> prevButton;  // Goes back slides
 
     //=========== AUDIO SYSTEM ===========//
     bool isMusicPlaying;        // Music state flag
@@ -48,22 +44,21 @@ public:
     void run();
 
     //=========== RESOURCE MANAGEMENT ===========//
-    void loadResources();
-    void createButtons();
-
+    void loadResources(); // Load all game resources like textures, fonts, and audio
     //=========== GAME LOOP SYSTEMS ===========//
-    void handleEvents();
-    void update();
-    void render();
+    void handleEvents(); // Handle user input events
+    void update(); // Update game logic
+    void render(); // Render graphics to the window
 
     //=========== TUTORIAL NAVIGATION ===========//
-    void goToPreviousPage();
-    void goToNextPage();
-    void changeState(std::unique_ptr<GameState> newState);
+    void goToPreviousPage(); // Navigate to the previous tutorial page
+    void goToNextPage(); // Navigate to the next tutorial page
+    void changeState(std::unique_ptr<GameState> newState); // Change the current game state
 
     //=========== GETTERS ===========//
     sf::RenderWindow& getWindow() { return window; }
     sf::Font& getFont() { return font; }
+    unsigned int getCurrentTutorialIndex() const { return currentTutorialIndex; } // Get current tutorial index for the save file
     std::unique_ptr<sf::Sprite>& getTitleSprite() { return titleSprite; }
     std::vector<sf::Texture>& getTextures() { return tutorialTextures; }
     std::unique_ptr<sf::Sprite>& getCurrentTutorialSprite() { return currentTutorialSprite; }

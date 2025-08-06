@@ -123,14 +123,58 @@ next next steps:
 - have mangoman load up and get some more whack ass buttons refer to rubric 
 - future me problem to be honest
 */
-/* 8/2 12:30 PM - 
+/* 8/2 12:30 PM - idk like 3-4 hours 
 + audio manager plays
 + loop is better
-- fix intro sprite 
-- fix loop sprite and button (u noticed a delay) loop for act0
-- fix ugly ass buttons (something is up with the compiler or how the buttons are being drawn in act0)
++ fix intro sprite 
++ fix loop sprite and button (u noticed a delay) loop for act0
++ fix ugly ass buttons (something is up with the compiler or how the buttons are being drawn in act0)
+*/
+/* 8/3 7pm - 12am
+o ahhh shit future me problem so instead of drawing buttons in the game, youʻre going to use states
+- start state: start button and save button will go here ---> act 0 or load from previous game
+CHECKPOINT: refer to rubric for code gaps
+- act0/tutorial state: 
+ o user can press esc to bring to a menu to save any state (.dat file? saves what loop theyʻre on)
+ o draw prev and next buttons to move between 1-4 sprites
+CHECKPOINT: refer to rubric for code gaps
+- act1: mangoman
+ o user can press esc to bring to a menu to save any state
+CHECKPOINT: refer to rubric for code gaps
+goal: states.
+future me problem: mangoman 
+o Observer***: "AudioManager notifies AchievementsSystem when sounds play"
+Memento: "SaveSystem captures GameState snapshots"
+
+side note: this game is more focused on sites and event handling.. 
+*/
+/*
+8/4 
++ refined states by ALOT: put all the button creation there, as well as audio yay.
++ added menu/edit program (future me problem to actually like implement it)
++ added save system (future me problem to actually implement it)
++ added credits plus made it so you can go back to the start state AND added meme song 
+
+TO DO: 
+o Observer***: "AudioManager notifies AchievementsSystem when sounds play"
+Memento: "SaveSystem captures GameState snapshots" IDK something that implements well and is a CLEAR 2nd design
+o ResourceManager [IMPORTANT, SKINNY-FY GAME CLASS]
+-- introduced in act1 undermango man + quiz maybe where it just saves the state of the game at ACT1
+ACT1 & save system....
+o state manager class
+o audio integration 
 
 
+put a pin in that: 
+- game handles both rendering and state transitions - a big back fat bitch on state mangements
+- Composition could be stronger (e.g., UI elements in states)
+- werid deadcode make it SKINNY updatePageIndicator
+- .dat file make it into a JSON for save file at end of tutorial.
+
+good practices: 
+- add debugs and comments for extra pts
+
+future me: start on report, clean code ALOT and presentation 4-5 days (10 hours min)
 */
 
 

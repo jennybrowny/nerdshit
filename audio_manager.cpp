@@ -12,17 +12,15 @@ void AudioManager::loadMusic(const std::string& key, const std::string& path) {
 }
 
 void AudioManager::playMusic(const std::string& key, bool loop) {
-    // Stop currently playing music
     if (currentMusic) {
         currentMusic->stop();
     }
     
-    // Find and play new music
     auto it = musicMap.find(key);
     if (it != musicMap.end()) {
         currentMusic = &it->second;
         currentMusicKey = key;
-        currentMusic->setLooping(loop);
+        currentMusic->setLooping(loop);  // Changed from setLoop to setLooping
         currentMusic->play();
     }
 }
@@ -51,6 +49,14 @@ void AudioManager::loadSound(const std::string& key, const std::string& path) {
     sounds[key] = std::make_unique<sf::Sound>(soundBuffers[key]);
 }
 
+sf::SoundSource::Status AudioManager::getMusicStatus(const std::string& key) const {
+    auto it = musicMap.find(key);
+    if (it != musicMap.end()) {
+        return it->second.getStatus();
+    }
+    return sf::SoundSource::Status::Stopped;
+}
+
 void AudioManager::playSound(const std::string& key) {
     if (sounds.find(key) != sounds.end()) {
         sounds[key]->play();
@@ -59,7 +65,7 @@ void AudioManager::playSound(const std::string& key) {
 
 void AudioManager::setMusicLoop(const std::string& key, bool loop) {
     if (musicMap.find(key) != musicMap.end()) {
-        musicMap[key].setLooping(loop);
+        musicMap[key].setLooping(loop);  // Changed from setLoop to setLooping
     }
 }
 
