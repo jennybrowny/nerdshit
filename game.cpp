@@ -34,18 +34,10 @@ Game::Game() :
     titleSprite(nullptr),                          // Title screen image
     fontLoaded(false)                              // Font loading state
 {
-    // Load tutorial images for ACT0
-    std::vector<std::string> tutorialPaths = {
-        "assets/ACT0/ACT01_0.PNG", // first image
-        "assets/ACT0/ACT01_1.PNG",
-        "assets/ACT0/ACT01_2.PNG", 
-        "assets/ACT0/ACT01_3.PNG" // last image
-    };
-
     // Get resource manager instance
     auto& resMgr = ResourceManager::getInstance();
 
-    // Load all tutorial textures through ResourceManager
+    // Preload all tutorial textures
     for (const auto& path : tutorialPaths) {
         tutorialTextures.push_back(resMgr.getTexture(path));
     }
@@ -64,16 +56,32 @@ Game::Game() :
 
 Game::~Game() {
     // Smart pointers automatically clean up
+    currentState.reset(); 
+    // Add debug log
+    std::cout << "Game resources cleaned up\n";
 }
 
 void Game::loadResources() {
     auto& audio = AudioManager::getInstance();
+    auto& resMgr = ResourceManager::getInstance();
 
-    // Audio loading music for background and sound effects
-    audio.loadMusic("background", "assets/sounds/Intro.mp3");
-    audio.loadMusic("act0", "assets/sounds/ACT0.mp3");
-    audio.loadSound("click", "assets/sounds/button_click.mp3");
+    try {
+        // Load all audio through the manager
+        audio.loadMusic("background", "assets/sounds/Intro.mp3");
+        audio.loadMusic("act0", "assets/sounds/ACT0.mp3"); 
+        audio.loadSound("click", "assets/sounds/button_click.mp3");
+        audio.loadSound("sparkle", "assets/sounds/sparkle.mp3");
+        
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Audio load failed: " << e.what() << "\n";
+        isMusicPlaying = false; // Disable audio on error
+        return; // Exit early if critical audio fails
+    }
+
     fontLoaded = false;
+
+    // future me problem to clean up font paths since I already have resource manager for this exact purpose
+    // Try loading the font from multiple common paths
     std::vector<std::string> fontPaths = {
         "arial.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
@@ -81,33 +89,28 @@ void Game::loadResources() {
         "/System/Library/Fonts/Helvetica.ttc"
     };
 
-auto& resMgr = ResourceManager::getInstance();
-for (const auto& path : fontPaths) {
     try {
-        font = resMgr.getFont(path);
-        std::cout << "Successfully loaded font: " << path << std::endl;
-        fontLoaded = true;
-        break;
-    } catch (const std::exception& e) {
-        std::cout << "Failed to load font: " << path << " - " << e.what() << std::endl;
-    }
-}
-
-    if (!fontLoaded) {
-        std::cout << "Warning: No fonts loaded - text will not display properly" << std::endl;
-    }
-
-    std::cout << "Attempting to load title screen texture..." << std::endl;
-    if (titleTexture.loadFromFile("assets/background/title_screen.png")) {
-        std::cout << "Title texture loaded successfully!" << std::endl;
+        titleTexture = resMgr.getTexture("assets/background/title_screen.png");
         titleSprite = std::make_unique<sf::Sprite>(titleTexture);
         scaleSpriteToWindow(*titleSprite);
-        std::cout << "Title sprite created and scaled" << std::endl;
-    } else {
-        std::cout << "WARNING: Failed to load title screen texture - using fallback color" << std::endl;
+
+        // Actually load the font and assign it to the member variable
+        for (const auto& path : fontPaths) {
+            try {
+                font = resMgr.getFont(path);  // This is critical!
+                fontLoaded = true;
+                std::cout << "Successfully loaded font from: " << path << std::endl;
+                break;
+            } catch (...) {
+                continue;
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cout << "WARNING: " << e.what() << std::endl;
         bgColor = sf::Color(50, 100, 150);
     }
 }
+
 // run the game loop 
 // -------------------------------------------------------------------
 // Main game loop that handles events, updates state, and renders graphics
@@ -138,10 +141,15 @@ void Game::run() {
 }
 
 void Game::handleEvents() {
-    // Delegated to current state
+    while (auto event = window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
+            window.close();
+        }
+    }
 }
 
 void Game::update() {
+    // Update game systems here
     auto& audio = AudioManager::getInstance();
     float vol = audio.getMusicVolume();
     if (vol > 5.f) {
@@ -150,6 +158,7 @@ void Game::update() {
         audio.stopMusic();
         isMusicPlaying = false;
     }
+    // Button updates happen in the current state's update()
 }
 
 void Game::render() {

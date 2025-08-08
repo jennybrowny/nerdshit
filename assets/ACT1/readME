@@ -7,6 +7,7 @@ Dr. Choi: "hello there! Welcome to the College of Engineering, itʻs 1:30 PM you
 Mangoman: 
 has the player do some nerdshit, tie it back to a core concept in ECE205, basic save system from states is introduced
 
+prompt user to play again? make sure the saved isnt a memory leak and you can overright it or something
 ACT1 builds from ACT0 addressing key gaps in the rubric:
 
 Inheritance/Composition (10pts)

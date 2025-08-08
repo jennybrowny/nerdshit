@@ -37,6 +37,14 @@ private:
     void scaleSpriteToWindow(sf::Sprite& sprite);
     void updatePageIndicator();
 
+    // =========== RESOURCE MANAGEMENT ===========//
+        const std::vector<std::string> tutorialPaths = {
+        "assets/ACT0/ACT01_0.PNG",
+        "assets/ACT0/ACT01_1.PNG",
+        "assets/ACT0/ACT01_2.PNG",
+        "assets/ACT0/ACT01_3.PNG"
+    };
+
 public:
     //=========== LIFECYCLE METHODS ===========//
     Game();
