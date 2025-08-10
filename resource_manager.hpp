@@ -24,6 +24,5 @@ private:
     
     std::unordered_map<std::string, sf::Texture> textures;
     std::unordered_map<std::string, sf::Font> fonts;
-    std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;  // Add this line
-
+    std::unordered_map<std::string, sf::SoundBuffer> soundBuffers; 
 };

@@ -36,7 +36,7 @@ CreditsState::CreditsState(sf::Font& font) :
         "CREDITS\n\n"
         "Created by: Jenny Brown\n"
         "Music by: Illegal Pirating\n"
-        "Special Thanks to:\n My soulmate, Chatgpt,\n Deepseek,\n Mangoman,\n Dr. Herve Collins\n\n"
+        "Special Thanks to:\n My soulmate and day 1 OG, Chatgpt,\n Deepseek, \n Claude Ai,\n Mangoman,\n Dr. Herve Collins\n\n"
         "I believe - Dr. Paul Schmitt Ph.D.\n"
     );
     creditsText.setFillColor(sf::Color::White);
@@ -102,6 +102,7 @@ void CreditsState::render(Game& game) {
     game.getWindow().draw(rainbow);
     game.getWindow().draw(creditsText);
     if (backButton) {
+        AudioManager::getInstance().playSound("sparkle");
         backButton->draw(game.getWindow());
     }
     game.getWindow().display();

@@ -38,21 +38,31 @@ private:
     void updatePageIndicator();
 
     // =========== RESOURCE MANAGEMENT ===========//
-        const std::vector<std::string> tutorialPaths = {
+    const std::vector<std::string> tutorialPaths = {
         "assets/ACT0/ACT01_0.PNG",
         "assets/ACT0/ACT01_1.PNG",
         "assets/ACT0/ACT01_2.PNG",
         "assets/ACT0/ACT01_3.PNG"
     };
+    
+    // Save game state
+    std::time_t lastSaveTime = 0;
 
 public:
     //=========== LIFECYCLE METHODS ===========//
     Game();
     ~Game();
     void run();
-
+    
+    //=========== GAME STATE MANAGEMENT ===========//
+    void saveGame(int act, int scene);
+    bool hasSavedGame() const;
+    std::pair<int, int> loadSavedGame();
+    std::string getSaveTime() const;
+    
     //=========== RESOURCE MANAGEMENT ===========//
     void loadResources(); // Load all game resources like textures, fonts, and audio
+    
     //=========== GAME LOOP SYSTEMS ===========//
     void handleEvents(); // Handle user input events
     void update(); // Update game logic

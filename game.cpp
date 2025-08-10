@@ -2,9 +2,11 @@
 #include "button.hpp" // Buttons
 #include <sstream> // For page number text
 #include <iostream>
+#include <filesystem>
 #include "states/start_state.hpp"
 #include "states/tutorial_state.hpp"
 #include "resource_manager.hpp"
+#include <fstream>
 
 /* 
 ███╗   ██╗███████╗██████╗ ██████╗ ███████╗██╗  ██╗██╗████████╗
@@ -51,8 +53,6 @@ Game::Game() :
     // Load other resources (fonts, audio, etc.)
     loadResources();
 }
-
-
 
 Game::~Game() {
     // Smart pointers automatically clean up
@@ -221,3 +221,69 @@ void Game::changeState(std::unique_ptr<GameState> newState) {
     currentState = std::move(newState);
 }
 
+// Save game state to a file with multiple slot support
+// -------------------------------------------------------------------
+void Game::saveGame(int act, int scene) {
+    // Find the first available slot or use slot 1 if none exist
+    int slotToUse = 1;
+    
+    // Check if any saves exist, if so, find next available slot
+    for (int i = 1; i <= 5; i++) {
+        std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
+        std::ifstream checkFile(saveFile);
+        if (!checkFile.good()) {
+            slotToUse = i;
+            break;
+        }
+    }
+    
+    // If all slots are full, use slot 1 (overwrite oldest)
+    std::string saveFile = "savegame_slot" + std::to_string(slotToUse) + ".dat";
+    std::ofstream file(saveFile);
+    if (file) {
+        lastSaveTime = std::time(nullptr);
+        file << act << " " << scene << " " << lastSaveTime;
+        std::cout << "Game saved to slot " << slotToUse << " at ACT" << act << "_" << scene << std::endl;
+    }
+}
+
+bool Game::hasSavedGame() const {
+    // Check if ANY save file exists
+    for (int i = 1; i <= 5; i++) {
+        std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
+        std::ifstream file(saveFile);
+        if (file.good()) return true;
+    }
+    return false;
+}
+
+std::pair<int, int> Game::loadSavedGame() {
+    // Load the most recent save
+    std::time_t mostRecent = 0;
+    int bestAct = 0, bestScene = 0;
+    
+    for (int i = 1; i <= 5; i++) {
+        std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
+        std::ifstream file(saveFile);
+        if (file.good()) {
+            int act, scene;
+            std::time_t saveTime;
+            if (file >> act >> scene >> saveTime) {
+                if (saveTime > mostRecent) {
+                    mostRecent = saveTime;
+                    bestAct = act;
+                    bestScene = scene;
+                    lastSaveTime = saveTime;
+                }
+            }
+        }
+    }
+    
+    return {bestAct, bestScene};
+}
+
+std::string Game::getSaveTime() const {
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&lastSaveTime));
+    return buffer;
+}
