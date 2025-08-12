@@ -1,11 +1,15 @@
-#include "game.hpp" // headers
-#include "button.hpp" // Buttons
-#include <sstream> // For page number text
-#include <iostream>
-#include <filesystem>
+#include "game.hpp"
+#include "button.hpp"
+#include "audio_manager.hpp"
+#include "resource_manager.hpp"
 #include "states/start_state.hpp"
 #include "states/tutorial_state.hpp"
-#include "resource_manager.hpp"
+#include "states/credits_state.hpp"
+#include "states/ACT1_state.hpp"
+#include "states/start_state.hpp" 
+#include <sstream>
+#include <iostream>
+#include <filesystem>
 #include <fstream>
 
 /* 
@@ -17,153 +21,143 @@
 ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝  ECE205, Summer 2025 
 */
 
-/* 
- * =============================================
- * GAME CLASS IMPLEMENTATION 
- * =============================================
- */
+const std::vector<std::string> Game::fontPaths = {
+    "assets/fonts/times.ttf",
+    "assets/fonts/arial.ttf"
+};
 
-// -------------------------------------------------------------------
-// Constructor: Initializes all game systems and resources
-// -------------------------------------------------------------------
 Game::Game() : 
-    window(sf::VideoMode({800, 600}), "NerdShit"),  // Main game window. 800x600 pixel size for sprite scaling
-    pageText(font, "", 24),                         // Page counter text
-    bgColor(sf::Color::Green),                      // Background fallback color
-    currentState(nullptr),                          // Initial game state 
-    isMusicPlaying(false),                         // Audio state flag
-    currentTutorialIndex(0),                       // Tutorial page index
-    titleSprite(nullptr),                          // Title screen image
-    fontLoaded(false)                              // Font loading state
+    window(sf::VideoMode({800, 600}), "NerdShit"),
+    pageText(font, "", 24),
+    bgColor(sf::Color::Green),
+    currentState(nullptr),
+    isMusicPlaying(false),
+    currentTutorialIndex(0),
+    fontLoaded(false),
+    lastSaveTime(0)
 {
-    // Get resource manager instance
-    auto& resMgr = ResourceManager::getInstance();
-
-    // Preload all tutorial textures
-    for (const auto& path : tutorialPaths) {
-        tutorialTextures.push_back(resMgr.getTexture(path));
-    }
-
-    // Create sprite with first texture if available
-    if (!currentTutorialSprite && !tutorialTextures.empty()) {
-        currentTutorialSprite = std::make_unique<sf::Sprite>(tutorialTextures[0]);
-        scaleSpriteToWindow(*currentTutorialSprite);
-    }
-
-    // Load other resources (fonts, audio, etc.)
     loadResources();
+    Button::preloadButtonSounds();
 }
 
 Game::~Game() {
-    // Smart pointers automatically clean up
-    currentState.reset(); 
-    // Add debug log
+    currentState.reset();
     std::cout << "Game resources cleaned up\n";
 }
 
 void Game::loadResources() {
-    auto& audio = AudioManager::getInstance();
+    loadAudioResources();
+    loadVisualResources();
+    
+    // Load tutorial textures
     auto& resMgr = ResourceManager::getInstance();
-
-    try {
-        // Load all audio through the manager
-        audio.loadMusic("background", "assets/sounds/Intro.mp3");
-        audio.loadMusic("act0", "assets/sounds/ACT0.mp3"); 
-        audio.loadSound("click", "assets/sounds/button_click.mp3");
-        audio.loadSound("sparkle", "assets/sounds/sparkle.mp3");
-        
-    } catch (const std::runtime_error& e) {
-        std::cerr << "Audio load failed: " << e.what() << "\n";
-        isMusicPlaying = false; // Disable audio on error
-        return; // Exit early if critical audio fails
+    for (const auto& path : tutorialPaths) {
+        try {
+            tutorialTextures.push_back(resMgr.getTexture(path));
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to load tutorial texture: " << path << "\n";
+        }
     }
+    
+    // Create first tutorial sprite
+    if (!tutorialTextures.empty()) {
+        currentTutorialSprite = std::make_unique<sf::Sprite>(tutorialTextures[0]);
+        scaleSpriteToWindow(*currentTutorialSprite);
+    }
+}
 
-    fontLoaded = false;
-
-    // future me problem to clean up font paths since I already have resource manager for this exact purpose
-    // Try loading the font from multiple common paths
-    std::vector<std::string> fontPaths = {
-        "arial.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-        "/System/Library/Fonts/Helvetica.ttc"
+void Game::loadAudioResources() {
+    auto& audio = AudioManager::getInstance();
+    const std::vector<std::pair<std::string, std::string>> audioFiles = {
+        {"background", "assets/sounds/Intro.mp3"},
+        {"act0", "assets/sounds/ACT0.mp3"},
+        {"click", "assets/sounds/button_click.mp3"},
+        {"sparkle", "assets/sounds/sparkle.mp3"}
     };
 
     try {
-        titleTexture = resMgr.getTexture("assets/background/title_screen.png");
-        titleSprite = std::make_unique<sf::Sprite>(titleTexture);
-        scaleSpriteToWindow(*titleSprite);
-
-        // Actually load the font and assign it to the member variable
-        for (const auto& path : fontPaths) {
-            try {
-                font = resMgr.getFont(path);  // This is critical!
-                fontLoaded = true;
-                std::cout << "Successfully loaded font from: " << path << std::endl;
-                break;
-            } catch (...) {
-                continue;
-            }
+        for (const auto& [name, path] : audioFiles) {
+            audio.loadMusic(name, path);
         }
-    } catch (const std::exception& e) {
-        std::cout << "WARNING: " << e.what() << std::endl;
-        bgColor = sf::Color(50, 100, 150);
+    } catch (const std::runtime_error& e) {
+        handleAudioLoadError(e);
     }
 }
 
-// run the game loop 
-// -------------------------------------------------------------------
-// Main game loop that handles events, updates state, and renders graphics
-// -------------------------------------------------------------------
+void Game::loadVisualResources() {
+    try {
+        loadTitleScreen();
+        loadFont();
+    } catch (const std::exception& e) {
+        handleVisualLoadError(e);
+    }
+}
+
+void Game::loadTitleScreen() {
+    auto& resMgr = ResourceManager::getInstance();
+    titleTexture = resMgr.getTexture("assets/background/title_screen.png");
+    titleSprite = std::make_unique<sf::Sprite>(titleTexture);
+    scaleSpriteToWindow(*titleSprite);
+}
+
+void Game::loadFont() {
+    auto& resMgr = ResourceManager::getInstance();
+    fontLoaded = false;
+    
+    for (const auto& path : fontPaths) {
+        if (tryLoadFont(path)) {
+            font = resMgr.getFont(path);
+            fontLoaded = true;
+            logFontSuccess(path);
+            break;
+        }
+    }
+}
+
+bool Game::tryLoadFont(const std::string& path) {
+    try {
+        auto& resMgr = ResourceManager::getInstance();
+        font = resMgr.getFont(path);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+void Game::handleAudioLoadError(const std::runtime_error& e) {
+    std::cerr << "Audio load failed: " << e.what() << "\n";
+    isMusicPlaying = false;
+}
+
+void Game::handleVisualLoadError(const std::exception& e) {
+    std::cout << "WARNING: " << e.what() << std::endl;
+    bgColor = sf::Color(50, 100, 150);
+}
+
+void Game::logFontSuccess(const std::string& path) {
+    std::cout << "Successfully loaded font from: " << path << std::endl;
+}
+
 void Game::run() {
     std::cout << "=== STARTING GAME LOOP ===" << std::endl;
     std::cout << "Font loaded: " << (fontLoaded ? "YES" : "NO") << std::endl;
-// intro music queues
-    if (isMusicPlaying) {
-        AudioManager::getInstance().playMusic("background");
-    } else {
-        AudioManager::getInstance().setMusicVolume(50.f);
-        AudioManager::getInstance().playMusic("background");
-        isMusicPlaying = true;
-    }
-    // Initialize the first state 
-    if (fontLoaded) {
-        currentState = std::make_unique<StartState>(font);
-    } else {
-        currentState = std::make_unique<StartState>(font);
-    }
+    
+    // Start background music
+    auto& audio = AudioManager::getInstance();
+    audio.setMusicVolume(50.f);
+    audio.playMusic("background");
+    isMusicPlaying = true;
+    
+    // Initialize first state
+    currentState = std::make_unique<StartState>(font);
 
     while (window.isOpen()) {
-        currentState->handleEvents(*this);
-        currentState->update(*this);
-        currentState->render(*this);
-    }
-}
-
-void Game::handleEvents() {
-    while (auto event = window.pollEvent()) {
-        if (event->is<sf::Event::Closed>()) {
-            window.close();
+        if (currentState) {
+            currentState->handleEvents(*this);
+            currentState->update(*this);
+            currentState->render(*this);
         }
     }
-}
-
-void Game::update() {
-    // Update game systems here
-    auto& audio = AudioManager::getInstance();
-    float vol = audio.getMusicVolume();
-    if (vol > 5.f) {
-        audio.setMusicVolume(vol - 0.5f);
-    } else {
-        audio.stopMusic();
-        isMusicPlaying = false;
-    }
-    // Button updates happen in the current state's update()
-}
-
-void Game::render() {
-    window.clear();
-    window.display();
 }
 
 void Game::scaleSpriteToWindow(sf::Sprite& sprite) {
@@ -171,20 +165,57 @@ void Game::scaleSpriteToWindow(sf::Sprite& sprite) {
     sf::Vector2u textureSize = texture.getSize();
     sf::Vector2u windowSize = window.getSize();
 
-    float scale = std::min(
-        static_cast<float>(windowSize.x) / textureSize.x,
-        static_cast<float>(windowSize.y) / textureSize.y
-    );
+    float scaleX = static_cast<float>(windowSize.x) / textureSize.x;
+    float scaleY = static_cast<float>(windowSize.y) / textureSize.y;
+    float scale = std::min(scaleX, scaleY);
 
     sprite.setScale(sf::Vector2f(scale, scale));
-    sprite.setOrigin(sf::Vector2f(
-        textureSize.x / 2.0f,
-        textureSize.y / 2.0f
-    ));
-    sprite.setPosition(sf::Vector2f(
-        windowSize.x / 2.0f,
-        windowSize.y / 2.0f
-    ));
+    sprite.setOrigin(sf::Vector2f(textureSize.x / 2.0f, textureSize.y / 2.0f));
+    sprite.setPosition(sf::Vector2f(windowSize.x / 2.0f, windowSize.y / 2.0f));
+}
+
+void Game::autoResizeSprite(sf::Sprite& sprite, const sf::Vector2u& targetSize) {
+    const sf::Texture& texture = sprite.getTexture();
+    sf::Vector2u textureSize = texture.getSize();
+    
+    float scaleX = static_cast<float>(targetSize.x) / textureSize.x;
+    float scaleY = static_cast<float>(targetSize.y) / textureSize.y;
+    float scale = std::min(scaleX, scaleY);
+    
+    sprite.setScale(sf::Vector2f(scale, scale));
+    sprite.setOrigin(sf::Vector2f(textureSize.x / 2.0f, textureSize.y / 2.0f));
+}
+
+void Game::scaleSpriteToContentArea(sf::Sprite& sprite, float uiReservedHeight) {
+    const sf::Texture& texture = sprite.getTexture();
+    sf::Vector2u textureSize = texture.getSize();
+    sf::Vector2u windowSize = window.getSize();
+    
+    float contentWidth = static_cast<float>(windowSize.x);
+    float contentHeight = static_cast<float>(windowSize.y) - uiReservedHeight;
+    
+    float scaleX = contentWidth / textureSize.x;
+    float scaleY = contentHeight / textureSize.y;
+    float scale = std::min(scaleX, scaleY);
+    
+    sprite.setScale(sf::Vector2f(scale, scale));
+    sprite.setOrigin(sf::Vector2f(textureSize.x / 2.0f, textureSize.y / 2.0f));
+    sprite.setPosition(sf::Vector2f(windowSize.x / 2.0f, contentHeight / 2.0f));
+}
+
+sf::Vector2u Game::getCurrentResolution() const {
+    return window.getSize();
+}
+
+bool Game::wasWindowResized() {
+    static sf::Vector2u lastSize = window.getSize();
+    sf::Vector2u currentSize = window.getSize();
+    
+    if (currentSize != lastSize) {
+        lastSize = currentSize;
+        return true;
+    }
+    return false;
 }
 
 void Game::updatePageIndicator() {
@@ -199,7 +230,7 @@ void Game::goToNextPage() {
         currentTutorialSprite->setTexture(tutorialTextures[currentTutorialIndex]);
         scaleSpriteToWindow(*currentTutorialSprite);
         updatePageIndicator();
-        AudioManager::getInstance().playSound("click"); // Add click sound
+        AudioManager::getInstance().playSound("click");
     }
 }
 
@@ -209,26 +240,23 @@ void Game::goToPreviousPage() {
         currentTutorialSprite->setTexture(tutorialTextures[currentTutorialIndex]);
         scaleSpriteToWindow(*currentTutorialSprite);
         updatePageIndicator();
-        AudioManager::getInstance().playSound("click"); // Add click sound
+        AudioManager::getInstance().playSound("click");
     }
 }
 
 void Game::changeState(std::unique_ptr<GameState> newState) {
-    // If transitioning to TutorialState, switch music to minecraft nerdshit
+    // Handle music transitions
     if (dynamic_cast<TutorialState*>(newState.get())) {
         AudioManager::getInstance().playMusic("act0", true);
     }
     currentState = std::move(newState);
 }
 
-// Save game state to a file with multiple slot support
-// -------------------------------------------------------------------
 void Game::saveGame(int act, int scene) {
-    // Find the first available slot or use slot 1 if none exist
     int slotToUse = 1;
     
-    // Check if any saves exist, if so, find next available slot
-    for (int i = 1; i <= 5; i++) {
+    // Find first available slot
+    for (int i = 1; i <= 4; i++) {
         std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
         std::ifstream checkFile(saveFile);
         if (!checkFile.good()) {
@@ -237,7 +265,6 @@ void Game::saveGame(int act, int scene) {
         }
     }
     
-    // If all slots are full, use slot 1 (overwrite oldest)
     std::string saveFile = "savegame_slot" + std::to_string(slotToUse) + ".dat";
     std::ofstream file(saveFile);
     if (file) {
@@ -248,8 +275,7 @@ void Game::saveGame(int act, int scene) {
 }
 
 bool Game::hasSavedGame() const {
-    // Check if ANY save file exists
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 1; i <= 4; i++) {
         std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
         std::ifstream file(saveFile);
         if (file.good()) return true;
@@ -258,11 +284,10 @@ bool Game::hasSavedGame() const {
 }
 
 std::pair<int, int> Game::loadSavedGame() {
-    // Load the most recent save
     std::time_t mostRecent = 0;
     int bestAct = 0, bestScene = 0;
     
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 1; i <= 4; i++) {
         std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
         std::ifstream file(saveFile);
         if (file.good()) {
@@ -287,3 +312,4 @@ std::string Game::getSaveTime() const {
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&lastSaveTime));
     return buffer;
 }
+

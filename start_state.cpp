@@ -7,39 +7,44 @@
 #include "states/credits_state.hpp"
 #include "states/tutorial_state.hpp"
 #include "states/ACT1_state.hpp"
+#include "states/save_state.hpp"
+#include "audio_manager.hpp"
 
 StartState::StartState(sf::Font& font) : selectedSaveSlot(-1) {
     std::cout << "=== StartState Constructor Called ===" << std::endl;
 
-    // menu buttons 
     try {
-        std::cout << "Attempting to create start button..." << std::endl;
+        // Main action buttons - centered and spaced nicely
         startButton = std::make_unique<Button>(
-            sf::Vector2f(200, 80),
-            sf::Vector2f(300, 260),
-            sf::Color::Green,
+            sf::Vector2f(250, 60),
+            sf::Vector2f(275, 250),
+            sf::Color(50, 150, 50), // Forest green
             font,
             "NEW GAME"
         );
-
-        // credits button 
+        
+        loadGameButton = std::make_unique<Button>(
+            sf::Vector2f(250, 50),
+            sf::Vector2f(275, 320),
+            sf::Color(80, 120, 200), // Blue
+            font,
+            "LOAD GAME"
+        );
+        
         creditsButton = std::make_unique<Button>(
-            sf::Vector2f(200, 80),
-            sf::Vector2f(300, 350),
-            sf::Color::Transparent,
+            sf::Vector2f(250, 50),
+            sf::Vector2f(275, 380),
+            sf::Color(100, 50, 150), // Purple
             font,
             "CREDITS"
         );
-        creditsButton->setOutlineEnabled(false);
-        creditsButton->setHoverColor(sf::Color::Yellow);
         
-        // Delete saves button
-        deleteButton = std::make_unique<Button>(
-            sf::Vector2f(150, 50),
-            sf::Vector2f(50, 500),
-            sf::Color::Red,
+        exitButton = std::make_unique<Button>(
+            sf::Vector2f(250, 50),
+            sf::Vector2f(275, 440),
+            sf::Color(150, 50, 50),  // Red color
             font,
-            "Clear Saves"
+            "EXIT GAME"
         );
         
         std::cout << "Menu buttons created successfully!" << std::endl;
@@ -47,97 +52,32 @@ StartState::StartState(sf::Font& font) : selectedSaveSlot(-1) {
         std::cout << "ERROR: Could not create buttons - " << e.what() << std::endl;
     } 
     
-    loadSaveSlots();
     std::cout << "StartState constructor completed." << std::endl;
 }
 
-void StartState::loadSaveSlots() {
-    saveSlots.clear();
-    
-    for (int i = 1; i <= 5; i++) {
-        std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
-        SaveSlot slot;
-        slot.slotNumber = i;
-        slot.exists = false;
-        
-        std::ifstream file(saveFile);
-        if (file.good()) {
-            int act, scene;
-            std::time_t saveTime;
-            if (file >> act >> scene >> saveTime) {
-                slot.exists = true;
-                slot.act = act;
-                slot.scene = scene;
-                slot.saveTime = saveTime;
-                
-                // Format save info
-                std::ostringstream oss;
-                oss << "Slot " << i << ": ACT" << act << "_" << scene;
-                slot.displayText = oss.str();
-                
-                // Format time
-                char timeBuffer[100];
-                std::strftime(timeBuffer, sizeof(timeBuffer), "%m/%d %H:%M", 
-                             std::localtime(&saveTime));
-                slot.timeText = timeBuffer;
-            }
-        }
-        
-        if (!slot.exists) {
-            slot.displayText = "Slot " + std::to_string(i) + ": Empty";
-            slot.timeText = "";
-        }
-        
-        saveSlots.push_back(slot);
-    }
-}
-
 void StartState::handleEvents(Game& game) {
+    sf::Vector2f mousePos = game.getWindow().mapPixelToCoords(
+        sf::Mouse::getPosition(game.getWindow()));
+
     while (auto event = game.getWindow().pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             game.getWindow().close();
         }
         else if (event->is<sf::Event::MouseButtonPressed>()) {
             const auto& mouseEvent = event->getIf<sf::Event::MouseButtonPressed>();
-            auto mousePos = game.getWindow().mapPixelToCoords({mouseEvent->position.x, mouseEvent->position.y});
+            mousePos = game.getWindow().mapPixelToCoords({mouseEvent->position.x, mouseEvent->position.y});
 
             if (startButton && startButton->isClicked(mousePos)) {
-                std::cout << "START button clicked!" << std::endl;
-                AudioManager::getInstance().playSound("click");
                 game.changeState(std::make_unique<TutorialState>(game));
             }
+            else if (loadGameButton && loadGameButton->isClicked(mousePos)) {
+                game.changeState(std::make_unique<SaveState>(game.getFont()));
+            }
             else if (creditsButton && creditsButton->isClicked(mousePos)) {
-                std::cout << "CREDITS button clicked!" << std::endl;
-                AudioManager::getInstance().playSound("click");
                 game.changeState(std::make_unique<CreditsState>(game.getFont()));
             }
-            else if (deleteButton && deleteButton->isClicked(mousePos)) {
-                // Delete all save files
-                for (int i = 1; i <= 5; i++) {
-                    std::string saveFile = "savegame_slot" + std::to_string(i) + ".dat";
-                    std::filesystem::remove(saveFile);
-                }
-                loadSaveSlots(); // Refresh the display
-                AudioManager::getInstance().playSound("click");
-                std::cout << "All saves cleared!" << std::endl;
-            }
-            else {
-                // Check if clicked on a save slot
-                for (int i = 0; i < saveSlots.size(); i++) {
-                    sf::FloatRect slotRect(sf::Vector2f(50, 50 + i * 40), sf::Vector2f(300, 35));
-                    if (slotRect.contains(mousePos) && saveSlots[i].exists) {
-                        // Load this save
-                        std::string saveFile = "savegame_slot" + std::to_string(saveSlots[i].slotNumber) + ".dat";
-                        std::ifstream file(saveFile);
-                        int act, scene;
-                        std::time_t saveTime;
-                        if (file >> act >> scene >> saveTime) {
-                            game.changeState(std::make_unique<ACT1_state>(game.getFont(), scene-1));
-                            AudioManager::getInstance().playSound("click");
-                        }
-                        break;
-                    }
-                }
+            else if (exitButton && exitButton->isClicked(mousePos)) {
+                game.getWindow().close();
             }
         }
         else if (event->is<sf::Event::KeyPressed>()) {
@@ -154,114 +94,60 @@ void StartState::update(Game& game) {
         sf::Mouse::getPosition(game.getWindow()));
     
     if (startButton) startButton->update(mousePos);
+    if (loadGameButton) loadGameButton->update(mousePos);
     if (creditsButton) creditsButton->update(mousePos);
-    if (deleteButton) deleteButton->update(mousePos);
-    
-    // Update selected save slot for hover effect
-    selectedSaveSlot = -1;
-    for (int i = 0; i < saveSlots.size(); i++) {
-        sf::FloatRect slotRect(sf::Vector2f(50, 50 + i * 40), sf::Vector2f(300, 35));
-        if (slotRect.contains(mousePos) && saveSlots[i].exists) {
-            selectedSaveSlot = i;
-            break;
-        }
-    }
+    if (exitButton) exitButton->update(mousePos);
 }
 
 void StartState::render(Game& game) {
-    std::cout << "StartState::render called" << std::endl;
+    // Gradient background
+    game.getWindow().clear(sf::Color(20, 25, 40));
     
-    // Clear the window first
-    game.getWindow().clear(sf::Color::Black);
-
-    // Draw title sprite if available
+    // Draw gradient background effect
+    sf::RectangleShape gradientTop(sf::Vector2f(800, 300));
+    gradientTop.setPosition(sf::Vector2f(0, 0));
+    gradientTop.setFillColor(sf::Color(30, 40, 60, 150));
+    game.getWindow().draw(gradientTop);
+    
+    // Draw title sprite if available - scaled to full window
     if (game.getTitleSprite()) {
-        std::cout << "Drawing title sprite" << std::endl;
+        game.scaleSpriteToWindow(*game.getTitleSprite());
         game.getWindow().draw(*game.getTitleSprite());
     } else {
-        std::cout << "No title sprite - drawing fallback background" << std::endl;
-        sf::RectangleShape background(sf::Vector2f(800, 600));
-        background.setFillColor(sf::Color(50, 100, 150));
-        game.getWindow().draw(background);
+        // Fallback title text
+        sf::Text titleText(game.getFont());
+        titleText.setString("NERDSHIT GAME");
+        titleText.setCharacterSize(48);
+        titleText.setFillColor(sf::Color::White);
+        titleText.setStyle(sf::Text::Bold);
+        sf::FloatRect titleBounds = titleText.getLocalBounds();
+        titleText.setOrigin(sf::Vector2f(titleBounds.position.x + titleBounds.size.x/2.0f,
+                           titleBounds.position.y + titleBounds.size.y/2.0f));
+        titleText.setPosition(sf::Vector2f(400, 100));
+        game.getWindow().draw(titleText);
     }
 
-    // Draw save slots
-    sf::Text saveTitle(game.getFont());
-    saveTitle.setString("Saved Games:");
-    saveTitle.setCharacterSize(24);
-    saveTitle.setFillColor(sf::Color::White);
-    saveTitle.setPosition(sf::Vector2f(50, 20));
-    game.getWindow().draw(saveTitle);
+    // Draw main buttons
+    if (startButton) startButton->draw(game.getWindow());
+    if (loadGameButton) loadGameButton->draw(game.getWindow());
+    if (creditsButton) creditsButton->draw(game.getWindow());
+    if (exitButton) exitButton->draw(game.getWindow());
     
-    for (int i = 0; i < saveSlots.size(); i++) {
-        sf::Vector2f slotPos(50, 50 + i * 40);
-        
-        // Draw slot background
-        sf::RectangleShape slotBg(sf::Vector2f(300, 35));
-        slotBg.setPosition(slotPos);
-        
-        if (saveSlots[i].exists) {
-            if (selectedSaveSlot == i) {
-                slotBg.setFillColor(sf::Color(100, 100, 200, 150)); // Hover effect
-            } else {
-                slotBg.setFillColor(sf::Color(50, 50, 50, 100));
-            }
-        } else {
-            slotBg.setFillColor(sf::Color(30, 30, 30, 80));
-        }
-        
-        game.getWindow().draw(slotBg);
-        
-        // Draw slot text
-        sf::Text slotText(game.getFont());
-        slotText.setString(saveSlots[i].displayText);
-        slotText.setCharacterSize(18);
-        slotText.setFillColor(saveSlots[i].exists ? sf::Color::White : sf::Color(128, 128, 128));
-        slotText.setPosition(sf::Vector2f(slotPos.x + 5, slotPos.y + 5));
-        game.getWindow().draw(slotText);
-        
-        // Draw time if save exists
-        if (saveSlots[i].exists && !saveSlots[i].timeText.empty()) {
-            sf::Text timeText(game.getFont());
-            timeText.setString(saveSlots[i].timeText);
-            timeText.setCharacterSize(14);
-            timeText.setFillColor(sf::Color(200, 200, 200));
-            timeText.setPosition(sf::Vector2f(slotPos.x + 200, slotPos.y + 15));
-            game.getWindow().draw(timeText);
-        }
-    }
+    // Version/info text
+    sf::Text versionText(game.getFont());
+    versionText.setString("Press ESC to quit");
+    versionText.setCharacterSize(12);
+    versionText.setFillColor(sf::Color(100, 100, 100));
+    versionText.setPosition(sf::Vector2f(10, 580));
+    game.getWindow().draw(versionText);
 
-    // Draw instructions
-    if (hasAnySaves()) {
-        sf::Text instruction(game.getFont());
-        instruction.setString("Click on a save slot to load");
-        instruction.setCharacterSize(16);
-        instruction.setFillColor(sf::Color::Yellow);
-        instruction.setPosition(sf::Vector2f(50, 270));
-        game.getWindow().draw(instruction);
-    }
-
-    // Draw buttons
-    if (startButton) {
-        std::cout << "Drawing start button" << std::endl;
-        startButton->draw(game.getWindow());
-    } 
-    if (creditsButton) { 
-        std::cout << "Drawing credits button" << std::endl;
-        creditsButton->draw(game.getWindow());
-    }
-    if (deleteButton && hasAnySaves()) {
-        std::cout << "Drawing delete button" << std::endl;
-        deleteButton->draw(game.getWindow());
-    }
+    // Instructions
+    sf::Text instructionText(game.getFont());
+    instructionText.setString("Click 'Load Game' to manage your saved games");
+    instructionText.setCharacterSize(14);
+    instructionText.setFillColor(sf::Color(180, 180, 100));
+    instructionText.setPosition(sf::Vector2f(275, 500));
+    game.getWindow().draw(instructionText);
 
     game.getWindow().display();
-    std::cout << "StartState::render completed" << std::endl;
-}
-
-bool StartState::hasAnySaves() const {
-    for (const auto& slot : saveSlots) {
-        if (slot.exists) return true;
-    }
-    return false;
 }
