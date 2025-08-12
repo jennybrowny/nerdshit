@@ -190,4 +190,51 @@ future me:
 [!] Buttons, SAVE FUNCTION, wrap up 1-3 days
 FUTURE FUTRE ME: report 
 */
- 
+ /* 
+ 8/6 6pm - 10pm
+ o started ACT 1, make save in .JSON file
+ - loop isn't going past ACT1_2.png ---> 11
+ must implement the next day or so
+ ACT1_1.png: prompt user to save (button) --> save dat. file to menu, contuine user
+ ACT2_2.png: prompt user for textbox string of player name save it THEN user can contuine 
+ ACT3_4.png: user name string is shown in sprite, prompt user for answer, illusion of choice it doesn't matter what they put
+ ACT3_5-->3_10: loop through with just next/prev
+ ACT3_11: pau. take user to credits_state
+ - for some reason a fucking factory for buttons? start on report by Saturday at latest
+ - make menu go to start_state
+ Future me problem: different states and how it's integrated with memory leaks and saving file
+ */
+ 8/9 2pm - 7:40 pm and then 8:30pm - 10:34pm
++ added save function on start screen
++ all sprites work in a loop
++ cleaned up UI a bit 
+- fucked up the click.sound on buttons and audio referencing so I have to replace that in 
+- my sprites look ugly as fuck, NEED to auto resize my sprites for every state when it's referenced
+- my save function menu is overlapping and need to place it in it's own page/state
+
+GOAL: 
+- slide deck / presentation 
+- move save menu to save state
+- add click buttons and audio to event handlings for each state 
+- input string text box in ACT1_2/11, 4/11 
+will referenced for player name
+in 4/11 player will enter in any number whatever they put it and click enter will pop up WRONG
+you got a % (put random generator from 0-60%) on the exam. 
+put a timer for 2 mins on the upper right, if they fail to put a string within that time they get an auto 0 and sent so credits state. 
+THEN the player can go to sprite 3.
+
+TO DO: ACT1_ LINE 438 FINISH THEN DEBUG...
+8/10 revision revision revision - where all the nerd shit comes together
+*/
+/*
+8/10 7pm - 9:30pm 
++ start menu sprite loads good... honestly im okay it not resizing need to move on
++ more audio loading in such mangoman and save button grunt, sparkle 
+- fucked up credits, liked rainbow better but variants is nice but need to reformat it 
+to clean up: tutorial instructions, ACT1, audio_manager, credits
+*/
+/* 8/11 4pm - 11pm
++ started outline on presentation
++ refined and cleaned up code, fuck things look like ass
+
+*/

@@ -1,84 +1,94 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "button.hpp"
-#include "audio_manager.hpp"
 #include <memory>
-#include "states/game_state.hpp"
+#include <vector>
+#include <string>
+#include <ctime>
 
+// Forward declarations
+class GameState;
 
 class Game {
-private:
-    //=========== CORE SYSTEMS ===========//
-    sf::RenderWindow window;    // Main game window
-    sf::Color bgColor;          // Background fallback color
+public:
+    Game();
+    ~Game();
     
-    //=========== TITLE SCREEN ===========//
-    sf::Texture titleTexture;   // Background image texture
-    std::unique_ptr<sf::Sprite> titleSprite; // Smart pointer to title graphic
+    void run();
+    void changeState(std::unique_ptr<GameState> newState);
     
-    //=========== TUTORIAL SYSTEM ===========//
-    std::vector<sf::Texture> tutorialTextures; // All tutorial slide images
-    std::unique_ptr<sf::Sprite> currentTutorialSprite; // Currently displayed slide
-    unsigned int currentTutorialIndex;         // Current slide position
-
-    //=========== AUDIO SYSTEM ===========//
-    bool isMusicPlaying;        // Music state flag
+    // Essential getters
+    sf::RenderWindow& getWindow() { return window; }
+    sf::Font& getFont() { return font; }
+    sf::Sprite* getTitleSprite() { return titleSprite.get(); }
     
-    //=========== TEXT SYSTEM ===========//
-    sf::Font font;              // Main UI font
-    sf::Text pageText;          // "X/Y" page counter
-    bool fontLoaded;            // Track if font was successfully loaded
-
-    // State management
-    std::unique_ptr<GameState> currentState;
-
-    //---------- PRIVATE HELPERS ----------//
+    // Sprite scaling utilities
     void scaleSpriteToWindow(sf::Sprite& sprite);
-    void updatePageIndicator();
+    void autoResizeSprite(sf::Sprite& sprite, const sf::Vector2u& targetSize);
+    void scaleSpriteToContentArea(sf::Sprite& sprite, float uiReservedHeight = 80.0f);
+    
+    // Save system
+    void saveGame(int act, int scene);
+    bool hasSavedGame() const;
+    std::pair<int, int> loadSavedGame();
+    std::string getSaveTime() const;
 
-    // =========== RESOURCE MANAGEMENT ===========//
-    const std::vector<std::string> tutorialPaths = {
+private:
+    // Core systems
+    sf::RenderWindow window;
+    sf::Font font;
+    bool fontLoaded;
+    std::unique_ptr<GameState> currentState;
+    
+    // Graphics - FIXED: Use smart pointer consistently
+    std::unique_ptr<sf::Sprite> titleSprite;
+    sf::Texture titleTexture;
+    sf::Color bgColor;
+    
+    // Audio
+    bool isMusicPlaying;
+    
+    // Save data
+    std::time_t lastSaveTime;
+    
+    // Tutorial system
+    std::vector<sf::Texture> tutorialTextures;
+    std::unique_ptr<sf::Sprite> currentTutorialSprite;
+    int currentTutorialIndex;
+    sf::Text pageText;
+    
+    static const std::vector<std::string> fontPaths;
+    static const inline std::vector<std::string> tutorialPaths = {
         "assets/ACT0/ACT01_0.PNG",
         "assets/ACT0/ACT01_1.PNG",
         "assets/ACT0/ACT01_2.PNG",
         "assets/ACT0/ACT01_3.PNG"
     };
     
-    // Save game state
-    std::time_t lastSaveTime = 0;
-
-public:
-    //=========== LIFECYCLE METHODS ===========//
-    Game();
-    ~Game();
-    void run();
+    // Initialization methods
+    void loadResources();
+    void loadAudioResources();
+    void loadVisualResources();
+    void loadTitleScreen();
+    void loadFont();
+    bool tryLoadFont(const std::string& path);
     
-    //=========== GAME STATE MANAGEMENT ===========//
-    void saveGame(int act, int scene);
-    bool hasSavedGame() const;
-    std::pair<int, int> loadSavedGame();
-    std::string getSaveTime() const;
+    // Event handling
+    void handleEvents();
+    void update();
+    void render();
     
-    //=========== RESOURCE MANAGEMENT ===========//
-    void loadResources(); // Load all game resources like textures, fonts, and audio
+    // Error handling
+    void handleAudioLoadError(const std::runtime_error& e);
+    void handleVisualLoadError(const std::exception& e);
+    void logFontSuccess(const std::string& path);
     
-    //=========== GAME LOOP SYSTEMS ===========//
-    void handleEvents(); // Handle user input events
-    void update(); // Update game logic
-    void render(); // Render graphics to the window
-
-    //=========== TUTORIAL NAVIGATION ===========//
-    void goToPreviousPage(); // Navigate to the previous tutorial page
-    void goToNextPage(); // Navigate to the next tutorial page
-    void changeState(std::unique_ptr<GameState> newState); // Change the current game state
-
-    //=========== GETTERS ===========//
-    sf::RenderWindow& getWindow() { return window; }
-    sf::Font& getFont() { return font; }
-    unsigned int getCurrentTutorialIndex() const { return currentTutorialIndex; } // Get current tutorial index for the save file
-    std::unique_ptr<sf::Sprite>& getTitleSprite() { return titleSprite; }
-    std::vector<sf::Texture>& getTextures() { return tutorialTextures; }
-    std::unique_ptr<sf::Sprite>& getCurrentTutorialSprite() { return currentTutorialSprite; }
-    AudioManager& getAudioManager() { return AudioManager::getInstance(); }
+    // Tutorial navigation
+    void updatePageIndicator();
+    void goToNextPage();
+    void goToPreviousPage();
+    
+    // Window utilities
+    sf::Vector2u getCurrentResolution() const;
+    bool wasWindowResized();
 };

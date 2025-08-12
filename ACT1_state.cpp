@@ -100,8 +100,9 @@ void ACT1_state::initializeUI() {
     playerNameInput->setPlaceholderText("Enter your name...");
     playerNameInput->setVisible(false);
     
+    // [MODIFIED] - Exam input box positioned at (450, 350) - moved right and down
     examInput = std::make_unique<InputTextBox>(
-        sf::Vector2f(100, 40), sf::Vector2f(350, 320), font, 2
+        sf::Vector2f(100, 40), sf::Vector2f(450, 350), font, 2
     );
     examInput->setPlaceholderText("??");
     examInput->setVisible(false);
@@ -133,8 +134,9 @@ void ACT1_state::initializeUI() {
     popupBackground.setOutlineColor(sf::Color(100, 150, 200));
     popupBackground.setPosition(sf::Vector2f(200, 240));
     
-    examPopupText.setCharacterSize(24);
-    examPopupText.setFillColor(sf::Color::White);
+    // [MODIFIED] - Big red exam score text for dramatic effect
+    examPopupText.setCharacterSize(42); // Bigger!
+    examPopupText.setFillColor(sf::Color::Red); // Red color for impact
     examPopupText.setStyle(sf::Text::Bold);
 }
 
@@ -230,7 +232,7 @@ void ACT1_state::updateButtons() {
         showNext = hasNext && nameEntered;
     }
     
-    // ACT1_4: Hide Next until exam is completed
+    // UPDATED - ACT1_4: Show Next immediately after exam is completed (score displayed)
     if (currentIndex == 3) {
         showNext = hasNext && examCompleted;
     }
@@ -264,16 +266,14 @@ void ACT1_state::handleTextInput(Game& game) {
         }
     }
     
-    // ACT1_4: Handle numeric exam input
+    // UPDATED - ACT1_4: Handle numeric exam input with immediate Next button availability
     if (currentIndex == 3 && examInput && examInput->getVisible()) {
         std::string examText = examInput->getText();
         if (examText.length() >= 2 && !examCompleted) {
             examCompleted = true;
-            examInput->setVisible(false);
             showExamScorePopup();
-            examScoreLocked = true;
-            updateButtons();
-            std::cout << "Exam input completed: " << examText << " (score locked until Next)\n";
+            updateButtons(); // Show Next button immediately after score is displayed
+            std::cout << "Exam input completed: " << examText << " (Next button now available)\n";
         }
     }
 }
@@ -297,6 +297,14 @@ void ACT1_state::showExamScorePopup() {
     
     showExamPopup = true;
     popupTimer = 3.0f;
+    
+    // Play dramatic sound effect when exam score is shown
+    try {
+        AudioManager::getInstance().playSound("sparkle");
+        std::cout << "Playing dramatic sparkle sound for exam score reveal\n";
+    } catch (...) {
+        std::cout << "Warning: Could not play sparkle sound\n";
+    }
 }
 
 std::string ACT1_state::getCurrentTimestamp() {
@@ -347,13 +355,13 @@ void ACT1_state::handleEvents(Game& game) {
                         std::cout << "Player name submitted: " << playerName << "\n";
                     }
                 }
+                // UPDATED - Enhanced exam submission with immediate Next button availability
                 else if (currentIndex == 3 && examInput && examInput->isFocusedBox()) {
-                    if (!examInput->getText().empty()) {
+                    if (!examInput->getText().empty() && examInput->getText().length() >= 2) {
                         examCompleted = true;
-                        examInput->setVisible(false);
                         showExamScorePopup();
-                        updateButtons();
-                        std::cout << "Exam submitted: " << examInput->getText() << "\n";
+                        updateButtons(); // Show Next button immediately
+                        std::cout << "Exam submitted via Enter: " << examInput->getText() << "\n";
                     }
                 }
             }
@@ -392,9 +400,9 @@ void ACT1_state::handleButtonClicks(Game& game, const sf::Vector2f& mousePos) {
             std::cout << "Warning: Could not play choi.ogg\n";
         }
         
-        // Show save confirmation with timestamp
+        // Show save confirmation with timestamp for 15 full seconds
         justSaved = true;
-        saveMessageTimer = 5.0f;
+        saveMessageTimer = 15.0f; // 15 seconds visibility
         saveTimestampText.setString(getCurrentTimestamp());
         
         // Center both texts
@@ -435,15 +443,16 @@ void ACT1_state::handleButtonClicks(Game& game, const sf::Vector2f& mousePos) {
 
 void ACT1_state::navigateToNext() {
     if (currentIndex < static_cast<int>(sprites.size()) - 1) {
-        // Unlock exam score when leaving sprite 4
-        if (currentIndex == 3 && examScoreLocked) {
-            examScoreLocked = false;
-            std::cout << "Exam score unlocked on Next action\n";
-        }
-        
         // Hide name confirmation when leaving ACT1_2
         if (currentIndex == 1) {
             showNameConfirmation = false;
+        }
+        
+        // UPDATED - Clean up exam UI when leaving sprite 4
+        if (currentIndex == 3) {
+            showExamPopup = false;
+            examScoreLocked = false;
+            std::cout << "Leaving ACT1_4: Cleaned up exam UI\n";
         }
         
         currentIndex++;
@@ -465,17 +474,21 @@ void ACT1_state::navigateToPrevious() {
 }
 
 void ACT1_state::update(Game& game) {
-    // Handle save message timer
-    if (saveMessageTimer > 0.0f) {
-        saveMessageTimer -= 0.016f;
+    // Get actual delta time for accurate timing
+    static sf::Clock deltaClock;
+    float deltaTime = deltaClock.restart().asSeconds();
+    
+    // FIXED - Enhanced save message timer with 15-second visibility using real delta time
+    if (justSaved && saveMessageTimer > 0.0f) {
+        saveMessageTimer -= deltaTime; // Use actual frame time instead of assumed 0.016f
         if (saveMessageTimer <= 0.0f) {
             justSaved = false;
         }
     }
     
-    // Handle exam popup timer
+    // UPDATED - Handle exam popup timer using real delta time
     if (showExamPopup && popupTimer > 0.0f) {
-        popupTimer -= 0.016f;
+        popupTimer -= deltaTime; // Use real delta time
         if (popupTimer <= 0.0f) {
             showExamPopup = false;
         }
@@ -507,12 +520,12 @@ void ACT1_state::update(Game& game) {
     if (creditsButton->isVisible()) creditsButton->update(mousePos);
     menuButton->update(mousePos);
     
-    // Update input text boxes
+    // Update input text boxes with real delta time
     if (playerNameInput && playerNameInput->getVisible()) {
-        playerNameInput->update(0.016f);
+        playerNameInput->update(deltaTime); // Use real delta time
     }
     if (examInput && examInput->getVisible()) {
-        examInput->update(0.016f);
+        examInput->update(deltaTime); // Use real delta time
     }
     
     handleTextInput(game);
@@ -552,11 +565,12 @@ void ACT1_state::render(Game& game) {
     }
     
     if (examInput && examInput->getVisible()) {
+        // [MODIFIED] - Updated exam instruction position for new input box location
         sf::Text examInstruction(font);
         examInstruction.setString("Enter exam answer (2 digits):");
         examInstruction.setCharacterSize(18);
         examInstruction.setFillColor(sf::Color::White);
-        examInstruction.setPosition(sf::Vector2f(280, 290));
+        examInstruction.setPosition(sf::Vector2f(450, 320)); // Adjusted for new input position
         game.getWindow().draw(examInstruction);
         
         examInput->draw(game.getWindow());
@@ -568,8 +582,8 @@ void ACT1_state::render(Game& game) {
         game.getWindow().draw(nameConfirmationText);
     }
     
-    // Draw exam score popup (only if unlocked or still timing)
-    if (showExamPopup && popupTimer > 0.0f && !examScoreLocked) {
+    // UPDATED - Draw exam score popup with fade effect, but always show persistent score when completed
+    if (showExamPopup && popupTimer > 0.0f) {
         float alpha = std::min(1.0f, popupTimer / 1.0f) * 255;
         sf::Color fadeColor = popupBackground.getFillColor();
         fadeColor.a = static_cast<uint8_t>(alpha);
@@ -583,6 +597,25 @@ void ACT1_state::render(Game& game) {
         game.getWindow().draw(examPopupText);
     }
     
+    // UPDATED - Draw persistent exam score when exam is completed (always visible after completion)
+    if (currentIndex == 3 && examCompleted) {
+        // Draw big red exam score text that stays visible
+        sf::Text persistentScore(font);
+        persistentScore.setString("EXAM SCORE: " + std::to_string(examScore) + "%");
+        persistentScore.setCharacterSize(42);
+        persistentScore.setFillColor(sf::Color::Red);
+        persistentScore.setStyle(sf::Text::Bold);
+        
+        sf::FloatRect scoreBounds = persistentScore.getLocalBounds();
+        persistentScore.setOrigin(sf::Vector2f(
+            scoreBounds.position.x + scoreBounds.size.x / 2.0f,
+            scoreBounds.position.y + scoreBounds.size.y / 2.0f
+        ));
+        persistentScore.setPosition(sf::Vector2f(400, 300));
+        
+        game.getWindow().draw(persistentScore);
+    }
+    
     // Draw UI elements
     renderUI(game);
     
@@ -590,7 +623,7 @@ void ACT1_state::render(Game& game) {
 }
 
 void ACT1_state::renderSpriteSpecificContent(Game& game) {
-    // ACT1_4 - Display player name without "Player:" prefix, moved down
+    // ACT1_4 - Display player name 
     if (currentIndex == 3 && !playerName.empty()) {
         sf::Text playerNameDisplay(font);
         playerNameDisplay.setString(playerName);
@@ -603,7 +636,7 @@ void ACT1_state::renderSpriteSpecificContent(Game& game) {
             nameBounds.position.x + nameBounds.size.x / 2.0f,
             nameBounds.position.y + nameBounds.size.y / 2.0f
         ));
-        playerNameDisplay.setPosition(sf::Vector2f(400, 272));
+        playerNameDisplay.setPosition(sf::Vector2f(400, 250)); // Moved up from 272 to 250
         
         game.getWindow().draw(playerNameDisplay);
     }
@@ -651,26 +684,29 @@ void ACT1_state::renderUI(Game& game) {
         creditsButton->draw(game.getWindow());
     }
     
-    // Enhanced save button and confirmation with timestamp display
+    // Enhanced save button and confirmation with 5-second timer and fade effect
     if (saveButton->isVisible()) {
         saveButton->draw(game.getWindow());
         
         if (justSaved && saveMessageTimer > 0.0f) {
-            // Enhanced fade effect based on remaining time
-            float alpha = std::min(1.0f, saveMessageTimer / 3.0f) * 255;
+            // Smooth fade effect over the last 3 seconds
+            float alpha = 1.0f;
+            if (saveMessageTimer <= 3.0f) {
+                alpha = saveMessageTimer / 3.0f; // Fade out over last 3 seconds
+            }
             
-            sf::Color saveColor(100, 255, 100, static_cast<uint8_t>(alpha));
+            sf::Color saveColor(100, 255, 100, static_cast<uint8_t>(alpha * 255));
             saveConfirmationText.setFillColor(saveColor);
             
-            sf::Color timeColor(150, 200, 150, static_cast<uint8_t>(alpha * 0.9f));
+            sf::Color timeColor(150, 200, 150, static_cast<uint8_t>(alpha * 0.9f * 255));
             saveTimestampText.setFillColor(timeColor);
             
             // Draw enhanced background for better readability
             sf::RectangleShape saveBackground(sf::Vector2f(520, 90));
             saveBackground.setPosition(sf::Vector2f(140, 190));
-            saveBackground.setFillColor(sf::Color(20, 30, 40, static_cast<uint8_t>(alpha * 0.8f)));
+            saveBackground.setFillColor(sf::Color(20, 30, 40, static_cast<uint8_t>(alpha * 0.8f * 255)));
             saveBackground.setOutlineThickness(2);
-            saveBackground.setOutlineColor(sf::Color(80, 120, 80, static_cast<uint8_t>(alpha)));
+            saveBackground.setOutlineColor(sf::Color(80, 120, 80, static_cast<uint8_t>(alpha * 255)));
             
             game.getWindow().draw(saveBackground);
             game.getWindow().draw(saveConfirmationText);

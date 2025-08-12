@@ -10,19 +10,3 @@ has the player do some nerdshit, tie it back to a core concept in ECE205, basic 
 prompt user to play again? make sure the saved isnt a memory leak and you can overright it or something
 ACT1 builds from ACT0 addressing key gaps in the rubric:
 
-Inheritance/Composition (10pts)
-
-+ IconButton inherits from Button + uses composition (sf::Sprite)
-============================================================================================================
-Design Patterns (15pts)
-
-+ Observer (AudioManager events) + Memento (SaveSystem)
-============================================================================================================
-
-Functionality (15pts)
-
-+  ACT0 → ACT1 transition + basic save system**
-============================================================================================================
-
-Use of Classes (15pts)
-+ Clear OOP (Kapuna hierarchy, specialized buttons)
