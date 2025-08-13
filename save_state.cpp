@@ -17,6 +17,8 @@ const sf::Color SaveState::hoveredColor = sf::Color(50, 80, 120, 120);
 const sf::Color SaveState::textColor = sf::Color(220, 220, 220);
 const sf::Color SaveState::emptySlotColor = sf::Color(40, 45, 55, 100);
 
+
+// Make slots for four games, with UI
 SaveState::SaveState(sf::Font& font) 
     : font(font), selectedSlot(-1), hoveredSlot(-1),
       titleText(font), instructionText(font)
@@ -44,7 +46,7 @@ SaveState::SaveState(sf::Font& font)
     titleBackground.setOutlineThickness(2);
     titleBackground.setOutlineColor(sf::Color(80, 100, 140));
     
-    // Title text - FIXED for SFML 3
+    // Title text 
     titleText.setString("SAVE GAME MANAGER");
     titleText.setCharacterSize(28);
     titleText.setFillColor(sf::Color(150, 200, 255));
@@ -56,8 +58,8 @@ SaveState::SaveState(sf::Font& font)
     ));
     titleText.setPosition(sf::Vector2f(400, 105));
     
-    // Instruction text - FIXED for SFML 3
-    instructionText.setString("Select a save slot to load or manage your saves");
+    // Instruction text 
+    instructionText.setString("Manage your saves");
     instructionText.setCharacterSize(16);
     instructionText.setFillColor(sf::Color(180, 180, 180));
     sf::FloatRect instrBounds = instructionText.getLocalBounds();
@@ -67,7 +69,7 @@ SaveState::SaveState(sf::Font& font)
     ));
     instructionText.setPosition(sf::Vector2f(400, 150));
     
-    // UPDATED - Create buttons with better positioning (Delete button removed)
+    // Buttons UI
     backButton = std::make_unique<Button>(
         sf::Vector2f(120, 45),
         sf::Vector2f(150, 470),
@@ -82,10 +84,7 @@ SaveState::SaveState(sf::Font& font)
         sf::Color(50, 120, 50),
         font,
         "LOAD GAME"
-    );
-    
-    // REMOVED - Delete button is no longer created (redundant with individual Clear buttons)
-    
+    );    
     newGameButton = std::make_unique<Button>(
         sf::Vector2f(140, 45),
         sf::Vector2f(470, 470),
@@ -107,6 +106,7 @@ SaveState::SaveState(sf::Font& font)
     createSlotVisuals();
 }
 
+// Get four saved slots and draw that shit
 void SaveState::loadSaveSlots() {
     saveSlots.clear();
     saveSlots.reserve(4); // Pre-allocate to avoid reallocations
@@ -149,7 +149,7 @@ void SaveState::loadSaveSlots() {
         }
     }
 }
-
+// Make it NOT ugly the slots
 void SaveState::createSlotVisuals() {
     for (size_t i = 0; i < saveSlots.size(); i++) {
         auto& slot = saveSlots[i];
@@ -167,7 +167,7 @@ void SaveState::createSlotVisuals() {
         slot.selectionOutline.setOutlineThickness(3);
         slot.selectionOutline.setOutlineColor(sf::Color(100, 150, 255));
         
-        // FIXED: Create sf::Text objects with font reference
+        // Create sf::Text objects with font reference
         slot.mainText = std::make_unique<sf::Text>(font);
         slot.mainText->setString(slot.displayText);
         slot.mainText->setCharacterSize(18);
@@ -322,21 +322,23 @@ void SaveState::update(Game& game) {
     sf::Vector2f mousePos = game.getWindow().mapPixelToCoords(
         sf::Mouse::getPosition(game.getWindow()));
     
-    // UPDATED - Update main buttons (Delete button removed)
+    // Main buttons 
     backButton->update(mousePos);
     loadButton->update(mousePos);
     newGameButton->update(mousePos);
     clearAllButton->update(mousePos);
     
-    // Update slot selection visuals (includes individual Clear button updates)
+    // Slot selection visuals (includes individual Clear button updates)
     updateSlotSelection(mousePos);
     
-    // UPDATED - Update button states based on selection (Delete button logic removed)
+    // Button states based on selection 
     loadButton->setVisible(selectedSlot >= 0 && selectedSlot < static_cast<int>(saveSlots.size()) && saveSlots[selectedSlot].exists);
     
     // Show Clear All button only if there are saves to clear
     clearAllButton->setVisible(hasAnySaves());
 }
+
+// Render everything... like literally everything
 
 void SaveState::render(Game& game) {
     // Clear with dark background
@@ -377,15 +379,15 @@ void SaveState::render(Game& game) {
         game.getWindow().draw(selectionInfo);
     }
     
-    // UPDATED - Draw main buttons (Delete button removed)
+    // Draw main buttons
     backButton->draw(game.getWindow());
     if (loadButton->isVisible()) loadButton->draw(game.getWindow());
     newGameButton->draw(game.getWindow());
     if (clearAllButton->isVisible()) clearAllButton->draw(game.getWindow());
     
-    // UPDATED - Draw instructions at bottom (Delete button reference removed)
+    // Draw instructions at bottom 
     sf::Text bottomInstructions(font);
-    bottomInstructions.setString("ESC: Back to Menu | Click slots to select | Use buttons to manage saves | Individual Clear buttons available");
+    bottomInstructions.setString("ESC: Back to Menu | Click slots to select | Use buttons to manage saves");
     bottomInstructions.setCharacterSize(11);
     bottomInstructions.setFillColor(sf::Color(120, 120, 120));
     bottomInstructions.setPosition(sf::Vector2f(30, 540));
@@ -393,6 +395,8 @@ void SaveState::render(Game& game) {
     
     game.getWindow().display();
 }
+
+// Function to load the saved game based on slot selection 
 
 void SaveState::loadSelectedSave(Game& game) {
     if (selectedSlot >= 0 && selectedSlot < static_cast<int>(saveSlots.size()) && saveSlots[selectedSlot].exists) {
@@ -411,9 +415,7 @@ void SaveState::loadSelectedSave(Game& game) {
     }
 }
 
-// REMOVED - deleteSelectedSave() method is no longer needed since Delete button is removed
-
-// Clear all saves functionality
+// Clear all saves functionality just in case the player is so fucking laazy, optional tho..
 void SaveState::clearAllSaves() {
     int clearedCount = 0;
     for (int i = 1; i <= 4; i++) {

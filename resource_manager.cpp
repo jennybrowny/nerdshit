@@ -3,7 +3,22 @@
 #include <SFML/System.hpp>
 #include <cstdint>
 #include <SFML/Audio.hpp>  
-
+/**
+ * @file resource_manager.cpp
+ * @brief Implementation of cross-platform resource management with intelligent fallbacks
+ * 
+ * - Cross-platform font detection and loading
+ * - Automatic error texture generation for missing images
+ * - Comprehensive emoji font support across operating systems (honestly I forgot about this)
+ * - Efficient resource caching with lazy loading 
+ * - Graceful degradation when resources are unavailable
+ * 
+ * Performance Characteristics:
+ * - First access: O(n) where n is resource file size
+ * - Subsequent access: O(1) hash table lookup
+ * - Memory usage: Proportional to total loaded resource size
+ * - Startup time: Minimal (lazy loading strategy)
+ */
 
 ResourceManager::ResourceManager() {
     // Constructor implementation (can be empty if no initialization needed)
@@ -69,7 +84,7 @@ sf::Font& ResourceManager::getFont(const std::string& path, bool isEmojiFont) {
     }
     return fonts[path];
 }
-
+// so I can create fall back backgrounds AND have an KICK ass credits state
 sf::Texture& ResourceManager::getTexture(const std::string& path) {
     if (textures.find(path) == textures.end()) {
         if (!textures[path].loadFromFile(path)) {
@@ -85,7 +100,7 @@ sf::Texture& ResourceManager::getTexture(const std::string& path) {
     }
     return textures[path];
 }
-
+// sound buffer/fall back
 sf::SoundBuffer& ResourceManager::getSoundBuffer(const std::string& path) {
     if (soundBuffers.find(path) == soundBuffers.end()) {
         if (!soundBuffers[path].loadFromFile(path)) {

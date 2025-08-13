@@ -222,7 +222,7 @@ void InputTextBox::setPlaceholderText(const std::string& placeholder) {
     }
 }
 
-// NEW: Set numeric-only mode
+// Set numeric-only mode
 void InputTextBox::setNumericOnly(bool numeric) {
     numericOnly = numeric;
     if (numeric) {
@@ -238,7 +238,7 @@ void InputTextBox::setNumericOnly(bool numeric) {
     }
 }
 
-// NEW: Set right-aligned text mode
+// Set right-aligned text mode
 void InputTextBox::setRightAligned(bool aligned) {
     rightAligned = aligned;
     updateDisplayText();
@@ -248,17 +248,17 @@ void InputTextBox::setRightAligned(bool aligned) {
     setPosition(currentPos);
 }
 
-// NEW: Get numeric-only mode status
+// Get numeric-only mode status
 bool InputTextBox::isNumericOnly() const {
     return numericOnly;
 }
 
-// NEW: Get right-aligned mode status  
+// Get right-aligned mode status  
 bool InputTextBox::isRightAligned() const {
     return rightAligned;
 }
 
-// NEW: Get focused status (for external checking)
+// Get focused status (for external checking)
 bool InputTextBox::isFocusedBox() const {
     return isFocused;
 }
@@ -266,7 +266,7 @@ bool InputTextBox::isFocusedBox() const {
 void InputTextBox::updateDisplayText() {
     displayText.setString(inputText);
     
-    // NEW: Handle right alignment
+    // Handle right alignment
     if (rightAligned && !inputText.empty()) {
         sf::Vector2f backgroundPos = background.getPosition();
         sf::Vector2f backgroundSize = background.getSize();

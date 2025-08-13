@@ -1,240 +1,317 @@
-// Nerdshit log of edits cause I canʻt remember shit
-// used Replit, Deepseek
+# SFML Interactive Story/Game Framework
 
-// ----------------------------------------
-// 7/21: 7 PM - 10 PM 
-// Wins: 
-// Game fucking compiles HOLY LEE SHIT AFTER THREE FUCKING WEEKS
-// Window is created (thanks Herve)
-// Window can upload a background image of nerd central
-// Start button created to go to introduction 
+## 🎮 **System Overview**
 
-// [TO DO 7/22, 3-5 Hours]
-// - Introduction ACT 0?
-// - Background sprite of bedroom with storytime spirtes to introduce the player to the game
-// - Dr. Song Choi sprite with his dialouge sprite because textboxes look P.O.O.R!
-// - Transitions to ACT 1: Mangoman ECE160  [ideal]
-// realistic: base min is you get up to Dr. Choi 
+This is a comprehensive C++ SFML framework for creating interactive story-based games with visual novel elements. The system features a modular state-based architecture with professional UI components, audio management, and persistent save functionality.
 
-// note to self: focus on above ^^ --- everything else future me problem
-// use your resources, touch grass, balance but remember
-// youʻve wrote a grant in 4 days... and got funded (fuck you Dutra you almost fucked me over)... 
-// you AI your way through your x496 with min help from Dr. Paul Schmiit Ph.D and you know what he said?
-// "I believe in you" (just like Herve) but ngl he just didnʻt want to look at your code cause it was "spagghetti code" 
-// but you did it anyways and YOU CAN DO IT AGAIN! 
-// ----------------------------------------
+@Mangoman: view nerdshit_log.txt to see me spiral 
 
-// ----------------------------------------
-// 7/22 2 PM - 4:52 PM
-// Wins: 
-// Refined used of classes: game, button (button looks great!)
-// Composition added: game contains button
-// Design patterns: use of statepatterns (start_screen, tutorial_Screen)
-// added sound onto start screen, buttons yay!
-//---
-// to do: the remaining issues are primarily API fixes and path validation. 
-// Gaps: still no inheritance (need screen class, ADD)
-// probably why tutorial is being whack
-// note to self: youʻre building a solid foundation of the core mechinanics now itʻs girlypoppifying it
-// you see the vision, you see the end goal, you see the light at the end of the tunnel. DO IT.
-// ----------------------------------------
+## 📋 **Table of Contents**
+- [Game Flow & Architecture](#game-flow--architecture)
+- [Core Framework Components](#core-framework-components)
+- [Game States & Navigation](#game-states--navigation)
+- [System Architecture Diagram](#system-architecture-diagram)
+- [Data Flow](#data-flow)
+- [Getting Started](#getting-started)
+- [Technical Implementation](#technical-implementation)
 
-// ----------------------------------------
-// 7/22  7PM - 10:43 PM | Gaps: still no inheritance (need screen class, ADD)
-// Wins: 
-// - BROKE THE FUCKING GAME but then got it to work again but lesser... loaded it back up
-// - making progress on button inhertiance! Woot woot, like had to strip it but itʻs worth a decent chunk of points
-//---
-// GAPS OKAY SOME HOW I REMOVED THE FUCKING SOUND FROM BUTTONS 2 steps back one step forward
-// - Need to fix sound on button click but make it an good damn inhertiance class 
-// - start on report and ACT I NOW get those pages going! Throw that shit into GPT 
-//    - find out how to structure ACT 0 intsro rubric using design patterns 
-//    - Another button... 
-//    - put a pin on the button sound just get through Act 0 
-// NEXT STEPS: ACT 0 
-// go to game.cpp, your goal is to get one turtoial sprite on the screen (ACT1_01.PNG)
-// scaling must likely the issue, solve it and have it fit in termial
-// you tried manually saving it as a PNG to exact dimensions of the window but frankly looks like you auto scale it anyways
-// note to self: add sound to buttons but eh not as important as going to act 0 and having the player click through sprites
-// ----------------------------------------
-// 7/23 - 7/24 FINISH ACT 0 -- sike bitch
-/*
-this is bullSHIT havenʻt finished ACT0 because the spirites are not loading
-going through each debug for classes and got overwhelmed 
-// ----------------------------------------
-*/
-/* 7/24 10am - 11:30am 
-handling button class, debugging went from 12 errors to 6
-- how i was calling in the text HAS AN ORDER
-- calling in a sound first when I didnʻt tell the header that it exists
-tl;dr basically im calling in shit without even considering the order or the bigger picture also my code 
-is so fucking spaggitti that instead of adding on and pushing through to finish ACT0 Iʻm backtracking to better understand
-what each class does so it doesnʻt fuck me up when Iʻm building on top of it
-*/
-/*
-// ----------------------------------------
-7/26 7pm - 9:33pm
-fixing button class turns out i fucked it up, the code works but my class for button doesnʻt 20+
-errors. FUCK.
-*/
-/*
-7/29 7pm - 12:00 am 
-- buttons still not working 
-- BUT itʻs the rubric. the rubric my dear that determines, youʻll get the screens going back 
-- you have to literally redo the whole structure just like w/ dr paul schmitt phd
-- youʻre not focusin on the chaos or substance but orgization. Trial and error.
-- you donʻt have alot of time but you can lock in. 
-to do 
-State Transition System
+---
 
-Ensure StartState → TutorialState works
+## 🎯 **Game Flow & Architecture**
 
-Implement proper TutorialState rendering
+### **High-Level Game Flow**
+```
+Start Menu → Tutorial → ACT1 (Main Story) → Save/Load System
+     ↓            ↓            ↓
+   Credits    Settings    Player Progress
+```
 
-Remove Code Duplication
+### **State Management Pattern**
+The game uses a **State Machine Pattern** where each screen/section is a separate state:
 
-Especially in Game::run() and audio manager
-*/
-/*
-7/30 
-so the classes are all stupid and i added states BUT it keeps going to the next page and I am
-dead ass unsure if itʻs actually going to the next state and going in that loop
-7/31 - 8/1
-BITCH it wasnʻt going in that loop now I redid it to get rid of all the bugs, and it did
-BUT OH MY GOD- the functionally.. u know the whole game isnʻt working. stupid ass header file.
-will do that later today... to be rebuilt you must burn it down first. 
-You did it before with Dr. Paul Schmitt PhD you. can. do. it. again. Remember what he said:
-"I believe"
-// ----------------------------------------
-8/1 8:04 PM - 11:40 PM. 
-OMG IT WORKS. HOLY LEE FUCK. IT WORKS. THE STUPID ASS LINKER DIDNT LINK 
-THEN THE SPRITES WASNT LOADING THAN THE STUPID ASS HEADERS WASNT IN THE RIGHT DIRECTORY.
-MANGOMAN DR PAUL SCHMITT PHD UR RIGHT. I MUST BELIEVE!!!! I MUST BELIEVE!!!
-These dainty tims hands do work and so does 2 shots of esspresso.
-THIS IS A HUGE WIN, Iʻm going to go to the loi patch, pick Mikayla up and touch mud
-cause what. the. fuck. 
+1. **StartState** - Main menu with game options
+2. **TutorialState** - Interactive tutorial system  
+3. **ACT1_state** - Main story progression with sprites and interactions
+4. **SaveState** - Save/load game functionality
+5. **CreditsState** - Game credits and information
 
-Next steps: 
-- have sprites auto scale (just a function so u dont have to scale EVERY SINGLE TIME FOR EACH CLASS)
-- fix font and stupid button class to display proprely 
-- refer to rubric to modify 
+---
 
-next next steps: 
-- have mangoman load up and get some more whack ass buttons refer to rubric 
-- future me problem to be honest
-*/
-/* 8/2 12:30 PM - idk like 3-4 hours 
-+ audio manager plays
-+ loop is better
-+ fix intro sprite 
-+ fix loop sprite and button (u noticed a delay) loop for act0
-+ fix ugly ass buttons (something is up with the compiler or how the buttons are being drawn in act0)
-*/
-/* 8/3 7pm - 12am
-o ahhh shit future me problem so instead of drawing buttons in the game, youʻre going to use states
-- start state: start button and save button will go here ---> act 0 or load from previous game
-CHECKPOINT: refer to rubric for code gaps
-- act0/tutorial state: 
- o user can press esc to bring to a menu to save any state (.dat file? saves what loop theyʻre on)
- o draw prev and next buttons to move between 1-4 sprites
-CHECKPOINT: refer to rubric for code gaps
-- act1: mangoman
- o user can press esc to bring to a menu to save any state
-CHECKPOINT: refer to rubric for code gaps
-goal: states.
-future me problem: mangoman 
-o Observer***: "AudioManager notifies AchievementsSystem when sounds play"
-Memento: "SaveSystem captures GameState snapshots"
+## 🔧 **Core Framework Components**
 
-side note: this game is more focused on sites and event handling.. 
-*/
-/*
-8/4 
-+ refined states by ALOT: put all the button creation there, as well as audio yay.
-+ added menu/edit program (future me problem to actually like implement it)
-+ added save system (future me problem to actually implement it)
-+ added credits plus made it so you can go back to the start state AND added meme song 
+### **1. UI System**
+- **InputTextBox**: Advanced text input with validation, alignment, and audio feedback
+- **Button**: Interactive buttons with hover effects and click sounds
+- **Visual Features**: Professional styling, animations, and responsive design
 
-TO DO: 
-o Observer***: "AudioManager notifies AchievementsSystem when sounds play"
-Memento: "SaveSystem captures GameState snapshots" IDK something that implements well and is a CLEAR 2nd design
-o ResourceManager [IMPORTANT, SKINNY-FY GAME CLASS]
--- introduced in act1 undermango man + quiz maybe where it just saves the state of the game at ACT1
-ACT1 & save system....
-o state manager class
-o audio integration 
+### **2. Resource Management**
+- **ResourceManager**: Cross-platform font/texture/audio loading with fallbacks
+- **Caching System**: Efficient resource reuse and memory management
+- **Platform Detection**: Automatic system font detection (Windows, macOS, Linux)
 
+### **3. Audio System**
+- **AudioManager**: Centralized music and sound effect management
+- **Music Streaming**: Background music with seamless transitions
+- **Sound Effects**: UI feedback and interactive audio cues
 
-put a pin in that: 
-- game handles both rendering and state transitions - a big back fat bitch on state mangements
-- Composition could be stronger (e.g., UI elements in states)
-- werid deadcode make it SKINNY updatePageIndicator
-- .dat file make it into a JSON for save file at end of tutorial.
+### **4. Save System**
+- **SaveManager**: JSON-based persistent storage
+- **Player Progress**: Name, scores, completion status
+- **Game State**: Current progress and achievements
 
-good practices: 
-- add debugs and comments for extra pts
+---
 
-future me: start on report, clean code ALOT and presentation 4-5 days (10 hours min)
-*/
+## 🎮 **Game States & Navigation**
 
-/*
-8/5 
-o updated resource manager 
-o added easter egg on credits (it was honestly a bug but fuck it lol itʻs funny)
-o refined state management and use of resource manager in game 
-- fucked up buttons but honestly it was annyoying the shit out of me on next/prev
+### **Start State (Main Menu)**
+```
+┌─────────────────────────────┐
+│        GAME TITLE           │
+│                             │
+│    [🎮 Start New Game]      │
+│    [📁 Load Game]           │
+│    [ℹ️ Credits]             │
+│    [❌ Exit]                │
+└─────────────────────────────┘
+```
 
-future me: 
-- fix buttons in turotial 
-- ACT1 start on a save function and prompt user to save 
-[!] Buttons, SAVE FUNCTION, wrap up 1-3 days
-FUTURE FUTRE ME: report 
-*/
- /* 
- 8/6 6pm - 10pm
- o started ACT 1, make save in .JSON file
- - loop isn't going past ACT1_2.png ---> 11
- must implement the next day or so
- ACT1_1.png: prompt user to save (button) --> save dat. file to menu, contuine user
- ACT2_2.png: prompt user for textbox string of player name save it THEN user can contuine 
- ACT3_4.png: user name string is shown in sprite, prompt user for answer, illusion of choice it doesn't matter what they put
- ACT3_5-->3_10: loop through with just next/prev
- ACT3_11: pau. take user to credits_state
- - for some reason a fucking factory for buttons? start on report by Saturday at latest
- - make menu go to start_state
- Future me problem: different states and how it's integrated with memory leaks and saving file
- */
- 8/9 2pm - 7:40 pm and then 8:30pm - 10:34pm
-+ added save function on start screen
-+ all sprites work in a loop
-+ cleaned up UI a bit 
-- fucked up the click.sound on buttons and audio referencing so I have to replace that in 
-- my sprites look ugly as fuck, NEED to auto resize my sprites for every state when it's referenced
-- my save function menu is overlapping and need to place it in it's own page/state
+**Features:**
+- New game initialization
+- Save file loading
+- Credits screen access
+- Clean exit functionality
 
-GOAL: 
-- slide deck / presentation 
-- move save menu to save state
-- add click buttons and audio to event handlings for each state 
-- input string text box in ACT1_2/11, 4/11 
-will referenced for player name
-in 4/11 player will enter in any number whatever they put it and click enter will pop up WRONG
-you got a % (put random generator from 0-60%) on the exam. 
-put a timer for 2 mins on the upper right, if they fail to put a string within that time they get an auto 0 and sent so credits state. 
-THEN the player can go to sprite 3.
+### **Tutorial State**
+```
+┌─────────────────────────────┐
+│    📚 TUTORIAL SYSTEM       │
+│                             │
+│  Interactive learning with  │
+│  step-by-step guidance      │
+│                             │
+│    [◀️ Previous] [Next ▶️]  │
+│    [🏠 Menu]               │
+└─────────────────────────────┘
+```
 
-TO DO: ACT1_ LINE 438 FINISH THEN DEBUG...
-8/10 revision revision revision - where all the nerd shit comes together
-*/
-/*
-8/10 7pm - 9:30pm 
-+ start menu sprite loads good... honestly im okay it not resizing need to move on
-+ more audio loading in such mangoman and save button grunt, sparkle 
-- fucked up credits, liked rainbow better but variants is nice but need to reformat it 
-to clean up: tutorial instructions, ACT1, audio_manager, credits
-*/
-/* 8/11 4pm - 11pm
-+ started outline on presentation
-+ refined and cleaned up code, fuck things look like ass
+**Features:**
+- Progressive tutorial system
+- Interactive elements demonstration
+- Navigation controls
+- Return to main menu
 
-*/
+### **ACT1 State (Main Game)**
+```
+┌─────────────────────────────┐
+│  🖼️ [Story Sprite Display]   │
+│                             │
+│  📝 Player Name: [_______]  │
+│  🧮 Exam Input: [_______]   │
+│                             │
+│ [◀️ Prev] [Next ▶️] [💾 Save] │
+│ [🏠 Menu] [ℹ️ Credits]      │
+└─────────────────────────────┘
+```
+
+**Features:**
+- **Sprite Navigation**: Story progression through visual scenes
+- **Player Input**: Name entry and exam interactions
+- **Save System**: Progress persistence
+- **Audio Integration**: Story-specific sounds and music
+- **Dynamic UI**: Context-sensitive interface elements
+
+### **Save State**
+```
+┌─────────────────────────────┐
+│       💾 SAVE SYSTEM        │
+│                             │
+│  📁 Save Slot 1: [Data]     │
+│  📁 Save Slot 2: [Empty]    │
+│  📁 Save Slot 3: [Data]     │
+│                             │
+│    [💾 Save] [📁 Load]      │
+│    [🏠 Back to Menu]        │
+└─────────────────────────────┘
+```
+
+**Features:**
+- Multiple save slots
+- Timestamped save data
+- Player progress tracking
+- JSON-based storage
+
+---
+
+## 🏗️ **System Architecture Diagram**
+
+```
+                    🎮 SFML GAME FRAMEWORK
+                           │
+        ┌─────────────────────────────────────────────────┐
+        │                GAME ENGINE                      │
+        │                                                 │
+        │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+        │  │ STATE       │  │ RESOURCE    │  │ AUDIO       │
+        │  │ MANAGER     │  │ MANAGER     │  │ MANAGER     │
+        │  │             │  │             │  │             │
+        │  │ • StartState│  │ • Fonts     │  │ • Music     │
+        │  │ • Tutorial  │  │ • Textures  │  │ • SFX       │
+        │  │ • ACT1      │  │ • Sprites   │  │ • Volume    │
+        │  │ • Save      │  │ • Cache     │  │ • Streaming │
+        │  │ • Credits   │  │ • Fallbacks │  │ • Feedback  │
+        │  └─────────────┘  └─────────────┘  └─────────────┘
+        │           │              │              │
+        └───────────┼──────────────┼──────────────┼─────────
+                    │              │              │
+        ┌─────────────────────────────────────────────────┐
+        │                UI FRAMEWORK                     │
+        │                                                 │
+        │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+        │  │INPUT        │  │ BUTTON      │  │ SAVE        │
+        │  │TEXTBOX      │  │ SYSTEM      │  │ MANAGER     │
+        │  │             │  │             │  │             │
+        │  │ • Text Entry│  │ • Hover FX  │  │ • JSON      │
+        │  │ • Validation│  │ • Click SFX │  │ • Persist   │
+        │  │ • Alignment │  │ • Visual FB │  │ • Load/Save │
+        │  │ • Cursor    │  │ • Centering │  │ • Progress  │
+        │  │ • Audio FB  │  │ • Visibility│  │ • Timestamps│
+        │  └─────────────┘  └─────────────┘  └─────────────┘
+        └─────────────────────────────────────────────────┘
+                           │
+        ┌─────────────────────────────────────────────────┐
+        │               PLATFORM LAYER                    │
+        │                                                 │
+        │    🖥️ Windows     🍎 macOS     🐧 Linux       │
+        │                                                 │
+        │  • System Fonts  • System Fonts  • System Fonts│
+        │  • Audio Output  • Audio Output  • Audio Output│
+        │  • File I/O      • File I/O      • File I/O    │
+        │  • Input Events  • Input Events  • Input Events│
+        └─────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 **Data Flow**
+
+### **Game Initialization**
+```
+1. 🚀 Application Start
+   ↓
+2. 📚 ResourceManager: Load system fonts
+   ↓
+3. 🔊 AudioManager: Initialize audio system
+   ↓
+4. 🎮 Game: Create StartState
+   ↓
+5. 🖥️ Display main menu
+```
+
+### **Player Interaction Flow**
+```
+🖱️ User Input
+   ↓
+🎮 Current State receives event
+   ↓
+📊 State processes input
+   ↓
+🔄 State updates game logic
+   ↓
+🎨 State renders to screen
+   ↓
+🔊 Audio feedback (if applicable)
+   ↓
+💾 Save progress (if applicable)
+```
+
+### **State Transition Flow**
+```
+Current State → Transition Request → Game Engine → New State
+      ↓              ↓                    ↓           ↓
+   Cleanup      Validation         State Change   Initialize
+```
+
+---
+
+## 🚀 **Getting Started**
+
+### **Prerequisites**
+- **SFML 2.5+**: Graphics, Audio, System modules
+- **nlohmann::json**: JSON serialization library
+- **C++17 Compiler**: Modern C++ features support
+
+### **Build Instructions**
+```bash
+# Install dependencies (Linux/Ubuntu)
+sudo apt install libsfml-dev nlohmann-json3-dev
+
+# Compile the project
+g++ -std=c++17 *.cpp -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system -o game
+
+# Run the game
+./game
+```
+
+### **Project Structure**
+```
+📁 Project Root/
+├── 🎮 Game States/
+│   ├── start_state.hpp/cpp     # Main menu
+│   ├── tutorial_state.hpp/cpp  # Tutorial system
+│   ├── ACT1_state.hpp/cpp      # Main story
+│   ├── save_state.hpp/cpp      # Save/load system
+│   └── credits_state.hpp/cpp   # Credits screen
+├── 🔧 Framework/
+│   ├── input_textbox.hpp/cpp   # Text input widget
+│   ├── button.hpp/cpp          # Interactive buttons
+│   ├── resource_manager.hpp/cpp # Resource loading
+│   ├── audio_manager.hpp/cpp   # Audio system
+│   └── save_manager.hpp/cpp    # Save/load system
+├── 🎯 Core/
+│   └── game_state.hpp          # State interface
+└── 📁 Assets/ (create these)
+    ├── sprites/                # Story images
+    ├── fonts/                  # Typography
+    └── sounds/                 # Audio files
+```
+
+---
+
+## ⚙️ **Technical Implementation**
+
+### **Design Patterns Used**
+- **State Pattern**: Game screen management
+- **Singleton Pattern**: Resource and audio managers
+- **Factory Pattern**: Platform-specific resource creation
+- **Observer Pattern**: Event-driven input handling
+- **RAII**: Automatic resource cleanup
+
+### **Performance Features**
+- **Lazy Loading**: Resources loaded on demand
+- **Caching System**: Prevent duplicate resource loading
+- **Efficient Rendering**: Conditional drawing and minimal GPU calls
+- **Memory Management**: Smart pointers and automatic cleanup
+
+### **Cross-Platform Support**
+- **Font Fallbacks**: System font detection on Windows, macOS, Linux
+- **Audio Formats**: OGG, WAV, FLAC support
+- **File I/O**: Platform-independent path handling
+- **Input Handling**: Consistent across operating systems
+
+### **Error Handling Strategy**
+- **Graceful Degradation**: Continue without audio/graphics if needed
+- **Fallback Resources**: Default fonts and textures when assets missing
+- **Descriptive Logging**: Clear error messages for debugging
+- **Exception Safety**: Robust error handling throughout
+
+---
+
+## 🎯 **Key Features Summary**
+
+### **Player Experience**
+- 📖 **Interactive Story**: Visual novel-style progression
+- 🎵 **Immersive Audio**: Background music and sound effects
+- 💾 **Save System**: Persistent progress tracking
+- 🖱️ **Responsive UI**: Professional interface with immediate feedback
+
+Mangoman... this is some nerd shit - but I learned alot. 

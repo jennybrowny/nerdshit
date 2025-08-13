@@ -17,7 +17,7 @@ public:
     void render(Game& game) override;
 
 private:
-    // audio resources
+    // Audio resources
     void loadAudioResources();
     // Core systems
     sf::Font& font;

@@ -7,9 +7,14 @@
 #include <cmath>
 #include <random>
 #include <cstdint>
+/*
 
+honestly this was optional but I was bored and wanted to see and get creative on what 
+SFML can do...
+*/
 
 CreditsState::CreditsState(sf::Font& font) : 
+// functions to provide crazy colorful animates
     creditsText(font),
     backgroundTexture(),
     backgroundSprite(backgroundTexture),
@@ -27,7 +32,7 @@ CreditsState::CreditsState(sf::Font& font) :
         std::cout << "Warning: Could not load credits music" << std::endl;
     }
     
-    // NEW: Randomize background variant (4 variants total)
+    // NRandomize background variant (3 variants total)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(1, 4);
@@ -131,7 +136,7 @@ void CreditsState::createDynamicBackground() {
     }
 }
 
-// NEW: Variant 1 - Spirals on left and right sides
+// Variant 1 - Spirals on left and right sides
 void CreditsState::createSpiralBackground() {
     const int segments = 100;
     leftSpiral.clear();
@@ -158,7 +163,7 @@ void CreditsState::createSpiralBackground() {
     std::cout << "Created spiral background with " << segments << " points per spiral" << std::endl;
 }
 
-// NEW: Variant 2 - Particle field in corners
+//  Variant 2 - Particle field in corners
 void CreditsState::createParticleFieldBackground() {
     const int particlesPerCorner = 25;
     cornerParticles.clear();
@@ -191,7 +196,7 @@ void CreditsState::createParticleFieldBackground() {
     std::cout << "Created particle field background with " << particleIndex << " particles" << std::endl;
 }
 
-// NEW: Variant 3 - Wave patterns at top and bottom
+// Variant 3 - Wave patterns at top and bottom
 void CreditsState::createWaveBackground() {
     const int wavePoints = 80;
     topWave.clear();
@@ -213,7 +218,7 @@ void CreditsState::createWaveBackground() {
     std::cout << "Created wave background with " << wavePoints << " points per wave" << std::endl;
 }
 
-// Original rainbow background (fallback)
+// Original rainbow background (fallback, my favorite)
 void CreditsState::createRainbowBackground() {
     const int segments = 50;
     rainbow.clear();
@@ -273,7 +278,7 @@ void CreditsState::updateSpirals() {
     }
 }
 
-// NEW: Update particle field with gentle movement
+// Update particle field with gentle movement
 void CreditsState::updateParticleField() {
     for (size_t i = 0; i < cornerParticles.size(); i++) {
         // Gentle floating motion
@@ -292,7 +297,7 @@ void CreditsState::updateParticleField() {
     }
 }
 
-// NEW: Update wave animation
+// Update wave animation
 void CreditsState::updateWaves() {
     const int wavePoints = topWave.getVertexCount();
     float wavePhase = animationTimer * 0.8f;
@@ -335,6 +340,7 @@ void CreditsState::updateRainbow() {
         rainbow[i].color = blendedColor;
     }
 }
+// Player opens credit page, crazy colorful background with text, they can click exit/menu
 
 void CreditsState::handleEvents(Game& game) {
     sf::Vector2f mousePos = game.getWindow().mapPixelToCoords(
@@ -371,6 +377,8 @@ void CreditsState::handleEvents(Game& game) {
     if (backButton) backButton->update(mousePos);
     if (exitButton) exitButton->update(mousePos);
 }
+
+// Rendering this bullshit
 
 void CreditsState::render(Game& game) {
     game.getWindow().clear(sf::Color(10, 15, 25)); // Dark background
@@ -413,8 +421,9 @@ void CreditsState::render(Game& game) {
     game.getWindow().display();
 }
 
+// Render color
 
-// NEW: Render spirals
+// Spirals
 void CreditsState::renderSpirals(Game& game) {
     // Draw spirals as point primitives for better performance
     if (leftSpiral.getVertexCount() > 0) {
@@ -425,14 +434,14 @@ void CreditsState::renderSpirals(Game& game) {
     }
 }
 
-// NEW: Render particle field
+// Particle field
 void CreditsState::renderParticleField(Game& game) {
     if (cornerParticles.size() > 0) {
         game.getWindow().draw(cornerParticles.data(), cornerParticles.size(), sf::PrimitiveType::Points);
     }
 }
 
-// NEW: Render waves
+// Waves
 void CreditsState::renderWaves(Game& game) {
     if (topWave.getVertexCount() > 0) {
        game.getWindow().draw(topWave);

@@ -23,7 +23,6 @@ public:
     void loadMusic(const std::string& key, const std::string& path);
     void playMusic(const std::string& key, bool loop = true);
     void stopMusic(const std::string& key = "");  // Empty string stops current
-    // REMOVED: void stopMusic(); // This was causing ambiguity
     
     // Music properties
     void setMusicLoop(const std::string& key, bool loop);
@@ -31,7 +30,7 @@ public:
     float getMusicVolume() const;
     sf::SoundSource::Status getMusicStatus(const std::string& key = "") const;
     
-    // NEW: Enhanced music control
+    // Enhanced music control
     std::string getCurrentMusicKey() const;
     bool isMusicPlaying(const std::string& key) const;
     bool isAnyMusicPlaying() const;

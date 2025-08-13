@@ -53,7 +53,7 @@ ACT1_state::ACT1_state(sf::Font& font, int startIndex)
     updateButtons();
     loadAudioResources();
 }
-
+// Loading singleton 
 void ACT1_state::loadAudioResources() {
     auto& audio = AudioManager::getInstance();
     try {
@@ -100,9 +100,9 @@ void ACT1_state::initializeUI() {
     playerNameInput->setPlaceholderText("Enter your name...");
     playerNameInput->setVisible(false);
     
-    // [MODIFIED] - Exam input box positioned at (450, 350) - moved right and down
+    // Exam input box positioned at from Mangoman 
     examInput = std::make_unique<InputTextBox>(
-        sf::Vector2f(100, 40), sf::Vector2f(450, 350), font, 2
+        sf::Vector2f(100, 40), sf::Vector2f(500, 350), font, 2
     );
     examInput->setPlaceholderText("??");
     examInput->setVisible(false);

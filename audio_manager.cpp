@@ -1,4 +1,3 @@
-// FIXED audio_manager.cpp - Remove ambiguous function
 #include "audio_manager.hpp"
 #include <iostream>
 
@@ -52,7 +51,6 @@ void AudioManager::stopMusic(const std::string& key) {
     }
 }
 
-// REMOVED: The parameterless stopMusic() function to fix ambiguity
 
 void AudioManager::loadSound(const std::string& key, const std::string& path) {
     if (!soundBuffers[key].loadFromFile(path)) {
